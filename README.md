@@ -70,3 +70,24 @@ Every project-scoped table traces back to a `project_id` via foreign keys. Every
 resolves that `project_id` and checks the requesting user's `project_members` role **before**
 reading or writing anything — never only filtered in the UI. See `src/lib/authz.ts` and
 `src/lib/resource-scope.ts`.
+
+## Users, roles & permissions
+
+A separate, database-driven RBAC layer (`roles`, `role_permissions`, `user_permission_overrides`
+tables) governs access to the **Projects, Users, Roles & Permissions, and Settings** modules —
+distinct from the per-project owner/editor/viewer membership above. 21 predefined roles ship
+out of the box; a **Project Manager** (the role every self-registered account gets by default)
+can create additional custom roles and users from the **Users**/**Roles & Permissions** pages,
+and configure a View/Create/Edit/Delete matrix per module, with optional per-user overrides.
+Enforcement happens in three places: the sidebar nav (hides links you can't use), `src/middleware.ts`
+(Node.js runtime; redirects away from `/users`, `/roles`, `/settings` at the routing level for
+users without view access — see `src/lib/permissions.ts`), and every underlying API route
+independently (so it can't be bypassed by calling the API directly).
+
+## Appearance / dark mode
+
+A real (not just dimmed) dark theme, toggled from the top bar or Settings → Appearance, stored
+per-account (`users.theme_preference`) so it follows you across devices, with an inline
+no-flash script in `src/app/layout.tsx` to avoid a flash of the wrong theme on load. It only
+affects the app UI — Word/PDF export (`src/utils/export/*`) always uses its own fixed,
+inline-styled document design regardless of theme.

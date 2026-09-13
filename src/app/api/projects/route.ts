@@ -1,14 +1,14 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { projects, projectMembers, reports } from "@/db/schema";
-import { requireUserId } from "@/lib/authz";
+import { requirePermission } from "@/lib/permissions";
 import { createProjectSchema } from "@/lib/validation/project";
 import { ApiError, withApiErrors } from "@/lib/api-response";
 import { newId } from "@/utils/id";
 
 export async function GET() {
   return withApiErrors(async () => {
-    const userId = await requireUserId();
+    const userId = await requirePermission("projects", "view");
     const rows = await db
       .select({ project: projects, role: projectMembers.role })
       .from(projectMembers)
@@ -22,7 +22,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   return withApiErrors(async () => {
-    const userId = await requireUserId();
+    const userId = await requirePermission("projects", "create");
     const body = createProjectSchema.parse(await req.json());
     const now = new Date().toISOString();
 

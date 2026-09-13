@@ -48,7 +48,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Branding panel */}
       <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-600 to-slate-900 p-12 text-white lg:flex">
         <div
@@ -96,21 +96,21 @@ function LoginForm() {
             <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
               <FileBarChart2 className="size-5" />
             </span>
-            <span className="text-base font-bold text-slate-900">Report Manager</span>
+            <span className="text-base font-bold text-slate-900 dark:text-slate-100">Report Manager</span>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
-          <p className="mt-1.5 text-sm text-slate-500">Log in to access your projects.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
+          <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">Log in to access your projects.</p>
 
           {error && (
-            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-600">
+              <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Email address
               </label>
               <input
@@ -127,7 +127,7 @@ function LoginForm() {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="block text-xs font-semibold text-slate-600">
+                <label htmlFor="password" className="block text-xs font-semibold text-slate-600 dark:text-slate-400">
                   Password
                 </label>
                 <Link href="/forgot-password" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
@@ -149,19 +149,19 @@ function LoginForm() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
               </div>
             </div>
 
-            <label className="flex select-none items-center gap-2 text-sm text-slate-600">
+            <label className="flex select-none items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
               <input
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="!w-auto size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                className="!w-auto size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800"
               />
               Remember me for 30 days
             </label>
@@ -171,14 +171,14 @@ function LoginForm() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
+            <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               Create one
             </Link>
           </p>
 
-          <p className="mt-10 text-center text-xs text-slate-400">Report Manager v1.0.0</p>
+          <p className="mt-10 text-center text-xs text-slate-400 dark:text-slate-600">Report Manager v1.0.0</p>
         </div>
       </div>
     </div>

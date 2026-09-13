@@ -10,6 +10,7 @@ interface AuthContextValue {
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -30,16 +31,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     loading,
     login: async (email, password, remember) => {
-      const u = await authService.login(email, password, remember);
-      setUser(u);
+      await authService.login(email, password, remember);
+      // login/register only return the bare account; fetch the full profile (role, permissions, theme).
+      setUser(await authService.me());
     },
     register: async (name, email, password) => {
-      const u = await authService.register(name, email, password);
-      setUser(u);
+      await authService.register(name, email, password);
+      setUser(await authService.me());
     },
     logout: async () => {
       await authService.logout();
       setUser(null);
+    },
+    refreshUser: async () => {
+      setUser(await authService.me());
     },
   };
 

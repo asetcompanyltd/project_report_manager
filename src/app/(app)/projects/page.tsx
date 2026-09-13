@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FolderKanban, Plus } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectContext } from "@/context/ProjectContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { NewProjectDialog } from "@/components/project/NewProjectDialog";
 import { EditProjectDialog } from "@/components/project/EditProjectDialog";
@@ -23,6 +24,8 @@ export default function ProjectsPage() {
   const { data: projects, isLoading, error } = useProjects();
   const { setCurrentProjectId } = useProjectContext();
   const router = useRouter();
+  const { can } = usePermissions();
+  const canCreate = can("projects", "create");
 
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -63,16 +66,22 @@ export default function ProjectsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
-          <p className="mt-1 text-sm text-slate-500">Create and switch between independent projects — each keeps its own data.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Projects</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Create and switch between independent projects — each keeps its own data.</p>
         </div>
-        <Button variant="primary" onClick={() => setShowNew(true)}>
-          <Plus className="size-4" />
-          New Project
-        </Button>
+        {canCreate && (
+          <Button variant="primary" onClick={() => setShowNew(true)}>
+            <Plus className="size-4" />
+            New Project
+          </Button>
+        )}
       </header>
 
-      {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Could not load projects.</div>}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
+          Could not load projects.
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -81,16 +90,18 @@ export default function ProjectsPage() {
           ))}
         </div>
       ) : !projects || projects.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <EmptyState
             icon={FolderKanban}
             title="No projects yet"
             description="Create your first project to start tracking its status report."
             action={
-              <Button variant="primary" onClick={() => setShowNew(true)}>
-                <Plus className="size-4" />
-                New Project
-              </Button>
+              canCreate && (
+                <Button variant="primary" onClick={() => setShowNew(true)}>
+                  <Plus className="size-4" />
+                  New Project
+                </Button>
+              )
             }
           />
         </div>
@@ -113,7 +124,7 @@ export default function ProjectsPage() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-white">
+            <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
               <EmptyState title="No matching projects" description="Try a different search term or status filter." />
             </div>
           ) : (

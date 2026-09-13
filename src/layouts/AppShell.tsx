@@ -9,8 +9,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:block">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900">
         <SidebarContent />
       </aside>
       <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />

@@ -1,16 +1,30 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, uniqueIndex, type AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 
 const id = () => text("id").primaryKey();
 const nowIso = () => sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
+
+export const userStatusValues = ["Active", "Inactive"] as const;
+export type UserStatus = (typeof userStatusValues)[number];
+
+export const themePreferenceValues = ["light", "dark", "system"] as const;
+export type ThemePreference = (typeof themePreferenceValues)[number];
 
 export const users = sqliteTable("users", {
   id: id(),
   email: text("email").notNull(),
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
+  // Added for RBAC/user-management: all nullable-or-defaulted so existing rows remain valid.
+  username: text("username"),
+  phone: text("phone"),
+  roleId: text("role_id").references((): AnySQLiteColumn => roles.id, { onDelete: "set null" }),
+  status: text("status").$type<UserStatus>().notNull().default("Active"),
+  profileImage: text("profile_image"),
+  themePreference: text("theme_preference").$type<ThemePreference>().notNull().default("system"),
+  lastLoginAt: text("last_login_at"),
   createdAt: text("created_at").notNull().default(nowIso()),
-}, (t) => [uniqueIndex("users_email_idx").on(t.email)]);
+}, (t) => [uniqueIndex("users_email_idx").on(t.email), uniqueIndex("users_username_idx").on(t.username)]);
 
 export const projectStatusValues = ["Active", "On Hold", "Completed", "Archived"] as const;
 export type ProjectStatus = (typeof projectStatusValues)[number];
@@ -107,4 +121,57 @@ export const snapshots = sqliteTable("snapshots", {
   label: text("label").notNull(),
   createdAt: text("created_at").notNull().default(nowIso()),
   data: text("data", { mode: "json" }).notNull(),
+});
+
+// ---- RBAC: roles, permissions, audit log, app settings ----
+
+export const roleStatusValues = ["Active", "Inactive"] as const;
+export type RoleStatus = (typeof roleStatusValues)[number];
+
+export const roles = sqliteTable("roles", {
+  id: id(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  status: text("status").$type<RoleStatus>().notNull().default("Active"),
+  isSystem: integer("is_system", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at").notNull().default(nowIso()),
+  updatedAt: text("updated_at").notNull().default(nowIso()),
+}, (t) => [uniqueIndex("roles_name_idx").on(t.name)]);
+
+export const permissionModuleValues = ["projects", "users", "roles", "settings"] as const;
+export type PermissionModule = (typeof permissionModuleValues)[number];
+
+export const rolePermissions = sqliteTable("role_permissions", {
+  id: id(),
+  roleId: text("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
+  module: text("module").$type<PermissionModule>().notNull(),
+  canView: integer("can_view", { mode: "boolean" }).notNull().default(false),
+  canCreate: integer("can_create", { mode: "boolean" }).notNull().default(false),
+  canEdit: integer("can_edit", { mode: "boolean" }).notNull().default(false),
+  canDelete: integer("can_delete", { mode: "boolean" }).notNull().default(false),
+}, (t) => [uniqueIndex("role_permissions_unique_idx").on(t.roleId, t.module)]);
+
+// Per-user overrides: NULL on a flag means "inherit from role"; true/false explicitly overrides it.
+export const userPermissionOverrides = sqliteTable("user_permission_overrides", {
+  id: id(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  module: text("module").$type<PermissionModule>().notNull(),
+  canView: integer("can_view", { mode: "boolean" }),
+  canCreate: integer("can_create", { mode: "boolean" }),
+  canEdit: integer("can_edit", { mode: "boolean" }),
+  canDelete: integer("can_delete", { mode: "boolean" }),
+}, (t) => [uniqueIndex("user_permission_overrides_unique_idx").on(t.userId, t.module)]);
+
+export const auditLog = sqliteTable("audit_log", {
+  id: id(),
+  userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+  action: text("action").notNull(),
+  details: text("details").notNull().default(""),
+  createdAt: text("created_at").notNull().default(nowIso()),
+});
+
+export const appSettings = sqliteTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value", { mode: "json" }).notNull(),
+  updatedAt: text("updated_at").notNull().default(nowIso()),
 });

@@ -13,8 +13,18 @@ export interface Project {
   role: ProjectRole;
 }
 
+export type UserStatus = "Active" | "Inactive";
+export type ThemePreference = "light" | "dark" | "system";
+
 export interface User {
   id: string;
   email: string;
   name: string;
+  username: string | null;
+  roleId: string | null;
+  roleName: string | null;
+  status: UserStatus;
+  profileImage: string | null;
+  themePreference: ThemePreference;
+  permissions: import("./permissions").PermissionMatrix;
 }

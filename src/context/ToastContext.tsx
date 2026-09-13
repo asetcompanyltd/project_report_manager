@@ -16,9 +16,18 @@ type ShowToast = (message: string, variant?: ToastVariant) => void;
 const ToastContext = createContext<ShowToast | null>(null);
 
 const VARIANT_STYLE: Record<ToastVariant, { icon: typeof CheckCircle2; classes: string }> = {
-  success: { icon: CheckCircle2, classes: "bg-white border-emerald-200 text-slate-800 [&_svg]:text-emerald-500" },
-  error: { icon: AlertCircle, classes: "bg-white border-red-200 text-slate-800 [&_svg]:text-red-500" },
-  info: { icon: Info, classes: "bg-white border-slate-200 text-slate-800 [&_svg]:text-slate-500" },
+  success: {
+    icon: CheckCircle2,
+    classes: "bg-white border-emerald-200 text-slate-800 [&_svg]:text-emerald-500 dark:bg-slate-800 dark:border-emerald-500/30 dark:text-slate-100",
+  },
+  error: {
+    icon: AlertCircle,
+    classes: "bg-white border-red-200 text-slate-800 [&_svg]:text-red-500 dark:bg-slate-800 dark:border-red-500/30 dark:text-slate-100",
+  },
+  info: {
+    icon: Info,
+    classes: "bg-white border-slate-200 text-slate-800 [&_svg]:text-slate-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100",
+  },
 };
 
 let idCounter = 0;
@@ -59,7 +68,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <Icon className="mt-0.5 size-[18px] shrink-0" />
               <p className="flex-1">{t.message}</p>
-              <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                 <X className="size-4" />
               </button>
             </div>

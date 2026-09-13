@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import { users } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { setSessionCookie } from "@/lib/session";
+import { DEFAULT_SELF_SIGNUP_ROLE_ID } from "@/lib/permissions";
 import { registerSchema } from "@/lib/validation/auth";
 import { ApiError, withApiErrors } from "@/lib/api-response";
 import { newId } from "@/utils/id";
@@ -22,6 +23,9 @@ export async function POST(req: Request) {
       email: body.email,
       name: body.name,
       passwordHash: await hashPassword(body.password),
+      // Self-registered users are setting up their own workspace, so they start as their own
+      // Project Manager (full access) — they can create teammate accounts with narrower roles afterward.
+      roleId: DEFAULT_SELF_SIGNUP_ROLE_ID,
     });
 
     await setSessionCookie(id);

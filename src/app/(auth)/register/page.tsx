@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-600 to-slate-900 p-12 text-white lg:flex">
         <div
           className="absolute inset-0 opacity-20"
@@ -89,21 +89,21 @@ export default function RegisterPage() {
             <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
               <FileBarChart2 className="size-5" />
             </span>
-            <span className="text-base font-bold text-slate-900">Report Manager</span>
+            <span className="text-base font-bold text-slate-900 dark:text-slate-100">Report Manager</span>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900">Create an account</h2>
-          <p className="mt-1.5 text-sm text-slate-500">Set up access to manage your projects.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Create an account</h2>
+          <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">Set up access to manage your projects.</p>
 
           {error && (
-            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="name" className="mb-1.5 block text-xs font-semibold text-slate-600">
+              <label htmlFor="name" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Full name
               </label>
               <input
@@ -119,7 +119,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-600">
+              <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Email address
               </label>
               <input
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-xs font-semibold text-slate-600">
+              <label htmlFor="password" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Password
               </label>
               <div className="relative">
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -166,14 +166,14 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-700">
+            <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               Log in
             </Link>
           </p>
 
-          <p className="mt-10 text-center text-xs text-slate-400">Report Manager v1.0.0</p>
+          <p className="mt-10 text-center text-xs text-slate-400 dark:text-slate-600">Report Manager v1.0.0</p>
         </div>
       </div>
     </div>

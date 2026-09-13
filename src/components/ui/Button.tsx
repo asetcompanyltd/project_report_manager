@@ -14,13 +14,13 @@ const VARIANT_CLASS: Record<Variant, string> = {
   primary:
     "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 focus-visible:ring-indigo-500 disabled:hover:bg-indigo-600",
   secondary:
-    "bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 focus-visible:ring-indigo-500 disabled:hover:bg-white",
-  ghost: "bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-indigo-500 disabled:hover:bg-transparent",
+    "bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 focus-visible:ring-indigo-500 disabled:hover:bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 dark:disabled:hover:bg-slate-800",
+  ghost: "bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-indigo-500 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800",
   danger:
-    "bg-white text-red-600 border border-red-200 shadow-sm hover:bg-red-50 focus-visible:ring-red-500 disabled:hover:bg-white",
+    "bg-white text-red-600 border border-red-200 shadow-sm hover:bg-red-50 focus-visible:ring-red-500 disabled:hover:bg-white dark:bg-slate-800 dark:border-red-500/30 dark:hover:bg-red-500/10",
   "danger-solid":
     "bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500 disabled:hover:bg-red-600",
-  icon: "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-indigo-500 disabled:hover:bg-transparent",
+  icon: "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-indigo-500 disabled:hover:bg-transparent dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200",
 };
 
 const SIZE_CLASS: Record<Size, string> = {
@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const sizing = variant === "icon" ? ICON_SIZE_CLASS[size] : SIZE_CLASS[size];
   const classes = [
     "inline-flex items-center justify-center font-medium whitespace-nowrap transition-colors",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ring-offset-white dark:ring-offset-slate-900",
     "disabled:opacity-50 disabled:cursor-not-allowed",
     "active:translate-y-px",
     VARIANT_CLASS[variant],

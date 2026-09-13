@@ -25,7 +25,7 @@ export function Pagination({
           onClick={() => onChange(p)}
           className={[
             "size-8 rounded-lg text-sm font-medium transition-colors",
-            p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100",
+            p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800",
           ].join(" ")}
           aria-current={p === page ? "page" : undefined}
         >

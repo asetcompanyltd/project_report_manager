@@ -15,7 +15,11 @@ export async function POST(req: Request) {
     if (!user || !passwordOk) {
       throw new ApiError(401, "INVALID_CREDENTIALS", "Incorrect email or password.");
     }
+    if (user.status === "Inactive") {
+      throw new ApiError(403, "ACCOUNT_INACTIVE", "This account has been deactivated. Contact your administrator.");
+    }
 
+    await db.update(users).set({ lastLoginAt: new Date().toISOString() }).where(eq(users.id, user.id));
     await setSessionCookie(user.id, body.remember);
     return { id: user.id, email: user.email, name: user.name };
   });
