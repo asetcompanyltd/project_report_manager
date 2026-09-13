@@ -95,6 +95,7 @@ export function PhasesTable({ report, workspace }: { report: Report; workspace: 
                           type="text"
                           value={p.name}
                           onChange={(e) => workspace.updatePhaseField(p.id, "name", e.target.value)}
+                          placeholder="e.g. Installation Phase"
                         />
                       </td>
                       <td className={td}>

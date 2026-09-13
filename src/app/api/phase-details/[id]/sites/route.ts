@@ -25,13 +25,13 @@ export async function POST(_req: Request, { params }: Params) {
       await tx.insert(sites).values({
         id: siteId,
         phaseDetailId,
-        name: "New Site",
+        name: "",
         status: "Not Started",
         progress: 0,
         targetDate: "",
         sortOrder: nextSortOrder(existing),
       });
-      await tx.insert(siteItems).values({ id: newId("item"), siteId, text: "New component", sortOrder: 0 });
+      await tx.insert(siteItems).values({ id: newId("item"), siteId, text: "", sortOrder: 0 });
     });
 
     const [created] = await db.select().from(sites).where(eq(sites.id, siteId)).limit(1);

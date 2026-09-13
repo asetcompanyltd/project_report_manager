@@ -20,7 +20,7 @@ export async function POST(_req: Request, { params }: Params) {
 
     const existing = await db.select({ sortOrder: siteItems.sortOrder }).from(siteItems).where(eq(siteItems.siteId, siteId));
     const id = newId("item");
-    await db.insert(siteItems).values({ id, siteId, text: "New component", sortOrder: nextSortOrder(existing) });
+    await db.insert(siteItems).values({ id, siteId, text: "", sortOrder: nextSortOrder(existing) });
 
     const [created] = await db.select().from(siteItems).where(eq(siteItems.id, id)).limit(1);
     return created;

@@ -40,13 +40,13 @@ export async function POST(_req: Request, { params }: Params) {
       await tx.insert(sites).values({
         id: siteId,
         phaseDetailId: pdId,
-        name: "New Site",
+        name: "",
         status: "Not Started",
         progress: 0,
         targetDate: "",
         sortOrder: 0,
       });
-      await tx.insert(siteItems).values({ id: newId("item"), siteId, text: "New component", sortOrder: 0 });
+      await tx.insert(siteItems).values({ id: newId("item"), siteId, text: "", sortOrder: 0 });
     });
 
     await logChange(report.id, `Added phase detail section for "${nextPhase.name}"`);

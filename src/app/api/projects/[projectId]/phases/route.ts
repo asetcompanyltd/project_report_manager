@@ -24,7 +24,7 @@ export async function POST(_req: Request, { params }: Params) {
     await db.insert(phases).values({
       id,
       reportId: report.id,
-      name: "New Phase",
+      name: "",
       status: "Not Started",
       progress: 0,
       targetDate: "",

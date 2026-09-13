@@ -21,31 +21,49 @@ export function useReportWorkspace(projectId: string | null) {
   const pendingSaves = useRef(0);
   const debounce = useKeyedDebounce(500);
 
+  // Silent background sync after a mutation (add/remove/reorder) — never toggles
+  // `loading`, so the page never unmounts back to the skeleton and loses scroll
+  // position/focus for what should be a small, in-place update.
   const refresh = useCallback(async () => {
-    if (!projectId) {
-      setReport(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
+    if (!projectId) return;
     try {
       const data = await reportService.get(projectId);
       setReport(data);
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Failed to load report.");
-    } finally {
-      setLoading(false);
     }
   }, [projectId]);
 
   useEffect(() => {
-    // Fetching on mount/projectId-change is exactly what this effect is for; `refresh`
-    // sets loading/error state synchronously before its `await`, which the stricter
-    // react-hooks lint rule can't distinguish from an unnecessary render-triggering effect.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    refresh();
-  }, [refresh]);
+    // Fetching on mount/projectId-change is exactly what this effect is for; setting
+    // loading/error/report state synchronously (before and after the `await`) is
+    // intentional here — this is the one place that's allowed to show the skeleton.
+    let cancelled = false;
+
+    if (!projectId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReport(null);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    reportService
+      .get(projectId)
+      .then((data) => {
+        if (!cancelled) setReport(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof ApiClientError ? err.message : "Failed to load report.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   const track = useCallback(async (fn: () => Promise<void>) => {
     pendingSaves.current += 1;

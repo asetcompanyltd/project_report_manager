@@ -22,7 +22,12 @@ export function NextStepsList({ report, workspace }: { report: Report; workspace
         <div className="space-y-2">
           {report.nextSteps.map((step) => (
             <div className="flex items-center gap-2" key={step.id}>
-              <input type="text" value={step.text} onChange={(e) => workspace.updateNextStep(step.id, e.target.value)} />
+              <input
+                type="text"
+                value={step.text}
+                onChange={(e) => workspace.updateNextStep(step.id, e.target.value)}
+                placeholder="e.g. Complete cabling at Site B"
+              />
               <Tooltip label="Remove">
                 <Button variant="icon" size="sm" onClick={() => workspace.removeNextStep(step.id)} aria-label="Remove next step">
                   <Trash2 className="size-4" />

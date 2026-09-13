@@ -56,6 +56,7 @@ export function SiteBlock({
             type="text"
             value={site.name}
             onChange={(e) => workspace.updateSiteField(phaseDetail.id, site.id, "name", e.target.value)}
+            placeholder="e.g. Intake Pump Station"
           />
         </FormField>
         <FormField label="Status" className="min-w-[130px] flex-1">
@@ -93,6 +94,7 @@ export function SiteBlock({
               type="text"
               value={item.text}
               onChange={(e) => workspace.updateSiteItem(phaseDetail.id, site.id, item.id, e.target.value)}
+              placeholder="e.g. Flow meter"
             />
             <Tooltip label="Remove component">
               <Button

@@ -21,7 +21,7 @@ export async function POST(_req: Request, { params }: Params) {
       .where(eq(nextSteps.reportId, report.id));
 
     const id = newId("step");
-    await db.insert(nextSteps).values({ id, reportId: report.id, text: "New next step", sortOrder: nextSortOrder(existing) });
+    await db.insert(nextSteps).values({ id, reportId: report.id, text: "", sortOrder: nextSortOrder(existing) });
 
     const [created] = await db.select().from(nextSteps).where(eq(nextSteps.id, id)).limit(1);
     return created;
