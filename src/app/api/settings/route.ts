@@ -24,6 +24,8 @@ const DEFAULTS: Record<(typeof SETTINGS_KEYS)[number], Record<string, unknown>> 
     systemNotifications: true,
     emailNotifications: false,
     alertOnOverdue: true,
+    senderEmail: "",
+    recipientEmails: [] as string[],
   },
   security: {
     minPasswordLength: 8,

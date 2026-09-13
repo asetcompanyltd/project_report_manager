@@ -44,6 +44,9 @@ dev-out.log
 # vercel
 .vercel
 
+# Claude Code runtime state
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -17,6 +17,13 @@ export const notificationSettingsSchema = z.object({
   systemNotifications: z.boolean().optional(),
   emailNotifications: z.boolean().optional(),
   alertOnOverdue: z.boolean().optional(),
+  senderEmail: z.string().trim().max(200).optional(),
+  recipientEmails: z.array(z.string().trim().max(200)).max(20).optional(),
+});
+
+export const testEmailSchema = z.object({
+  senderEmail: z.string().trim().email("Enter a valid sender email address"),
+  recipientEmails: z.array(z.string().trim().email("Enter valid recipient email addresses")).min(1, "Add at least one recipient email"),
 });
 
 export const securitySettingsSchema = z.object({

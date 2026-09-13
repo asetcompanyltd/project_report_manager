@@ -15,6 +15,13 @@ export interface NotificationSettings {
   systemNotifications: boolean;
   emailNotifications: boolean;
   alertOnOverdue: boolean;
+  senderEmail: string;
+  recipientEmails: string[];
+}
+
+export interface TestEmailInput {
+  senderEmail: string;
+  recipientEmails: string[];
 }
 
 export interface SecuritySettings {
@@ -62,4 +69,5 @@ export const settingsService = {
   update: (input: UpdateSettingsInput) => api.patch<{ key: SettingsKey; values: SettingsValues }>("/api/settings", input),
   auditLog: (page = 1) => api.get<{ entries: AuditLogEntry[]; page: number; pageSize: number }>(`/api/audit-log?page=${page}`),
   getBranding: () => api.get<Branding>("/api/settings/branding"),
+  sendTestEmail: (input: TestEmailInput) => api.post<{ success: boolean }>("/api/settings/notifications/test-email", input),
 };

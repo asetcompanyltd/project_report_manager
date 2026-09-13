@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { settingsService, type UpdateSettingsInput } from "@/services/settings";
+import { settingsService, type UpdateSettingsInput, type TestEmailInput } from "@/services/settings";
 
 const SETTINGS_KEY = ["settings"];
 const BRANDING_KEY = ["settings", "branding"];
@@ -20,6 +20,12 @@ export function useUpdateSettings() {
       qc.invalidateQueries({ queryKey: SETTINGS_KEY });
       if (variables.key === "general") qc.invalidateQueries({ queryKey: BRANDING_KEY });
     },
+  });
+}
+
+export function useSendTestEmail() {
+  return useMutation({
+    mutationFn: (input: TestEmailInput) => settingsService.sendTestEmail(input),
   });
 }
 
