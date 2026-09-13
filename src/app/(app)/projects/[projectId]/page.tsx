@@ -1,15 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { ClipboardCopy, FileDown, FileText, Loader2, CheckCircle2, AlertCircle, Plus } from "lucide-react";
 import { useReportWorkspace } from "@/hooks/useReportWorkspace";
 import { projectsService } from "@/services/projects";
 import { ApiClientError } from "@/services/apiClient";
 import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { WorkspaceSkeleton } from "@/components/ui/Skeleton";
 import { ReportMetaCard } from "@/components/report/ReportMetaCard";
 import { PhasesTable } from "@/components/report/PhasesTable";
 import { PhaseDetailSection } from "@/components/report/PhaseDetailSection";
@@ -37,7 +35,7 @@ export default function ProjectWorkspacePage() {
     try {
       await workspace.addPhaseDetail();
     } catch (err) {
-      showToast(err instanceof ApiClientError ? err.message : "Could not add section.", "error");
+      showToast(err instanceof ApiClientError ? err.message : "Could not add section.");
     }
   }
 
@@ -47,7 +45,7 @@ export default function ProjectWorkspacePage() {
     navigator.clipboard
       ?.writeText(text)
       .then(() => showToast("Summary copied to clipboard"))
-      .catch(() => showToast("Copy failed — please select and copy manually", "error"));
+      .catch(() => showToast("Copy failed — please select and copy manually"));
   }
 
   function handleDownloadWord() {
@@ -58,56 +56,40 @@ export default function ProjectWorkspacePage() {
 
   async function handleExportPdf() {
     if (!report) return;
-    showToast("Generating PDF…", "info");
+    showToast("Generating PDF…");
     try {
       const { pdf, filename } = await generatePdf(report);
       pdf.save(filename);
       showToast("PDF downloaded");
     } catch {
       if (openPrintFallback(report)) {
-        showToast("Could not auto-generate PDF — opened print dialog instead", "info");
+        showToast("Could not auto-generate PDF — opened print dialog instead");
       }
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Breadcrumbs items={[{ label: "Dashboard", href: "/projects" }, { label: "Loading…" }]} />
-        <WorkspaceSkeleton />
-      </div>
-    );
-  }
-
-  if (error || !report) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-        {error ?? "Report not found."}
-      </div>
-    );
-  }
+  if (loading) return <div className="wrap center-loading">Loading report…</div>;
+  if (error || !report) return <div className="wrap form-error">{error ?? "Report not found."}</div>;
 
   return (
-    <div className="space-y-6 pb-10">
-      <Breadcrumbs items={[{ label: "Dashboard", href: "/projects" }, { label: project?.name ?? "Project" }]} />
-
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="wrap">
+      <header className="top">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{project?.name ?? "Project"}</h1>
-          <p className="mt-1 text-sm text-slate-500">Update your project status here, then export a formatted Word document or PDF.</p>
+          <Link href="/projects" style={{ fontSize: 12, color: "var(--grey)" }}>
+            ← All Projects
+          </Link>
+          <h1>{project?.name ?? "Project"} — Report Manager</h1>
+          <p>Update your project status here, then export a formatted Word document or PDF.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={handleCopySummary}>
-            <ClipboardCopy className="size-4" />
+        <div className="actions">
+          <Button variant="ghost" onClick={handleCopySummary}>
             Copy Summary
           </Button>
-          <Button variant="secondary" onClick={handleExportPdf}>
-            <FileDown className="size-4" />
+          <Button variant="ghost" onClick={handleExportPdf}>
             Export PDF
           </Button>
           <Button variant="primary" onClick={handleDownloadWord}>
-            <FileText className="size-4" />
-            Download Word
+            Download Word Document
           </Button>
         </div>
       </header>
@@ -115,24 +97,22 @@ export default function ProjectWorkspacePage() {
       <ReportMetaCard report={report} updateMeta={workspace.updateMeta} setLogo={workspace.setLogo} />
       <PhasesTable report={report} workspace={workspace} />
 
-      <div className="space-y-4">
-        {report.phaseDetails.map((pd, i) => (
-          <PhaseDetailSection
-            key={pd.id}
-            phaseDetail={pd}
-            index={i}
-            sectionCount={report.phaseDetails.length}
-            phases={report.phases}
-            workspace={workspace}
-          />
-        ))}
-        <button
-          onClick={handleAddPhaseDetail}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-white py-4 text-sm font-semibold text-slate-500 transition-colors hover:border-indigo-400 hover:text-indigo-600"
-        >
-          <Plus className="size-4" />
-          Add phase detail section
-        </button>
+      {report.phaseDetails.map((pd, i) => (
+        <PhaseDetailSection
+          key={pd.id}
+          phaseDetail={pd}
+          index={i}
+          sectionCount={report.phaseDetails.length}
+          phases={report.phases}
+          workspace={workspace}
+        />
+      ))}
+      <div className="card">
+        <div className="add-row" style={{ marginTop: 0 }}>
+          <Button variant="primary" onClick={handleAddPhaseDetail}>
+            + Add phase detail section
+          </Button>
+        </div>
       </div>
 
       <NextStepsList report={report} workspace={workspace} />
@@ -141,25 +121,17 @@ export default function ProjectWorkspacePage() {
       <HistoryCard report={report} workspace={workspace} />
       <DataCard report={report} workspace={workspace} />
 
-      <div className="flex justify-end">
-        <SaveStatusPill status={workspace.saveStatus} />
+      <div className="save-bar-inline">
+        <span className={`save-note ${workspace.saveStatus}`}>
+          {workspace.saveStatus === "saving"
+            ? "Saving…"
+            : workspace.saveStatus === "saved"
+              ? "All changes saved"
+              : workspace.saveStatus === "failed"
+                ? "Save failed — check your connection"
+                : ""}
+        </span>
       </div>
     </div>
-  );
-}
-
-function SaveStatusPill({ status }: { status: "idle" | "saving" | "saved" | "failed" }) {
-  if (status === "idle") return null;
-  const config = {
-    saving: { icon: Loader2, text: "Saving…", classes: "bg-slate-100 text-slate-500", spin: true },
-    saved: { icon: CheckCircle2, text: "All changes saved", classes: "bg-emerald-50 text-emerald-700", spin: false },
-    failed: { icon: AlertCircle, text: "Save failed — check your connection", classes: "bg-red-50 text-red-700", spin: false },
-  }[status];
-  const Icon = config.icon;
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${config.classes}`}>
-      <Icon className={`size-3.5 ${config.spin ? "animate-spin" : ""}`} />
-      {config.text}
-    </span>
   );
 }

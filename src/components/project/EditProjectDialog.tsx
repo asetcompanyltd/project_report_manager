@@ -52,25 +52,24 @@ export function EditProjectDialog({
     <Modal
       open={!!project}
       title="Edit Project"
-      description="Update this project's details."
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose} type="button">
+          <Button variant="ghost" onClick={onClose} type="button">
             Cancel
           </Button>
-          <Button variant="primary" form="edit-project-form" type="submit" loading={updateProject.isPending}>
-            Save Changes
+          <Button variant="primary" form="edit-project-form" type="submit" disabled={updateProject.isPending}>
+            {updateProject.isPending ? "Saving…" : "Save Changes"}
           </Button>
         </>
       }
     >
-      {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{error}</div>}
-      <form id="edit-project-form" onSubmit={handleSubmit} className="space-y-4">
-        <FormField label="Project Name" required>
+      {error && <div className="form-error">{error}</div>}
+      <form id="edit-project-form" onSubmit={handleSubmit}>
+        <FormField label="Project Name">
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
         </FormField>
-        <FormField label="Project Code / ID" required>
+        <FormField label="Project Code / ID">
           <input type="text" value={code} onChange={(e) => setCode(e.target.value)} required />
         </FormField>
         <FormField label="Description">

@@ -51,28 +51,27 @@ export function NewProjectDialog({
     <Modal
       open={open}
       title="New Project"
-      description="Set up a new, fully isolated project workspace."
       onClose={() => {
         reset();
         onClose();
       }}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose} type="button">
+          <Button variant="ghost" onClick={onClose} type="button">
             Cancel
           </Button>
-          <Button variant="primary" form="new-project-form" type="submit" loading={createProject.isPending}>
-            Create Project
+          <Button variant="primary" form="new-project-form" type="submit" disabled={createProject.isPending}>
+            {createProject.isPending ? "Creating…" : "Create Project"}
           </Button>
         </>
       }
     >
-      {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{error}</div>}
-      <form id="new-project-form" onSubmit={handleSubmit} className="space-y-4">
-        <FormField label="Project Name" required>
+      {error && <div className="form-error">{error}</div>}
+      <form id="new-project-form" onSubmit={handleSubmit}>
+        <FormField label="Project Name">
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
         </FormField>
-        <FormField label="Project Code / ID" required hint="Must be unique">
+        <FormField label="Project Code / ID">
           <input
             type="text"
             value={code}

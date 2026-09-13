@@ -1,10 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { Upload, Download } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { useConfirm } from "@/hooks/useConfirm";
 import { reportService, type ImportBackupPayload } from "@/services/report";
 import { useToast } from "@/context/ToastContext";
 import type { Report } from "@/types/report";
@@ -16,7 +14,6 @@ function safeFileTitle(base: string): string {
 
 export function DataCard({ report, workspace }: { report: Report; workspace: ReportWorkspace }) {
   const showToast = useToast();
-  const confirm = useConfirm();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleExport() {
@@ -55,43 +52,29 @@ export function DataCard({ report, workspace }: { report: Report; workspace: Rep
     try {
       parsed = JSON.parse(text);
     } catch {
-      showToast("Import failed — not a valid JSON file", "error");
+      showToast("Import failed — not a valid JSON file");
       return;
     }
     const body = parsed as { data?: unknown; snapshots?: unknown[] };
     if (!body || typeof body !== "object" || !body.data) {
-      showToast("Import failed — file is not a recognized backup", "error");
+      showToast("Import failed — file is not a recognized backup");
       return;
     }
-    const ok = await confirm({
-      title: "Import this backup?",
-      description: "This replaces your current unsaved data and versions with the contents of this file.",
-      confirmLabel: "Import backup",
-      danger: true,
-    });
-    if (!ok) return;
+    if (!window.confirm("Import this backup? This will replace your current unsaved data and versions.")) return;
     await workspace.importBackup(body as ImportBackupPayload);
     showToast("Data imported");
   }
 
   return (
-    <Card title="Data" description="Export a full backup or bring one in from another project.">
-      <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" size="sm" onClick={handleExport}>
-          <Download className="size-4" />
+    <Card title="Data">
+      <div className="add-row" style={{ marginTop: 0 }}>
+        <Button variant="ghost" onClick={handleExport}>
           Export Data (JSON)
         </Button>
-        <Button variant="secondary" size="sm" onClick={handleImportClick}>
-          <Upload className="size-4" />
+        <Button variant="ghost" onClick={handleImportClick}>
           Import Data (JSON)
         </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/json,.json"
-          className="hidden"
-          onChange={handleImportFile}
-        />
+        <input ref={fileInputRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={handleImportFile} />
       </div>
     </Card>
   );
