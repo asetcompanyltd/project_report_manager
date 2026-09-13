@@ -37,6 +37,14 @@ export function useSetUserStatus() {
   });
 }
 
+export function useDeleteUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => usersService.remove(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: USERS_KEY }),
+  });
+}
+
 export function useResetPassword() {
   return useMutation({
     mutationFn: ({ id, password }: { id: string; password: string }) => usersService.resetPassword(id, password),

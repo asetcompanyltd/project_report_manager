@@ -11,7 +11,7 @@ import { useConfirm } from "@/hooks/useConfirm";
 import type { Report } from "@/types/report";
 import type { ReportWorkspace } from "@/hooks/useReportWorkspace";
 
-const th = "px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500";
+const th = "px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400";
 const td = "px-3 py-2.5 align-top";
 
 export function PhasesTable({ report, workspace }: { report: Report; workspace: ReportWorkspace }) {
@@ -49,7 +49,7 @@ export function PhasesTable({ report, workspace }: { report: Report; workspace: 
           <div className="-mx-5 overflow-x-auto px-5">
             <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-slate-200 dark:border-slate-800">
                   <th className={`${th} w-16`}></th>
                   <th className={th}>Phase</th>
                   <th className={`${th} w-36`}>Status</th>
@@ -63,7 +63,7 @@ export function PhasesTable({ report, workspace }: { report: Report; workspace: 
                 {report.phases.map((p, i) => {
                   const overdue = isOverdue(p.targetDate, p.status);
                   return (
-                    <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
+                    <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60 dark:border-slate-800 dark:hover:bg-slate-800/40">
                       <td className={td}>
                         <div className="flex gap-0.5">
                           <Tooltip label="Move up">

@@ -8,7 +8,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, roleId: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // login/register only return the bare account; fetch the full profile (role, permissions, theme).
       setUser(await authService.me());
     },
-    register: async (name, email, password) => {
-      await authService.register(name, email, password);
+    register: async (name, email, password, roleId) => {
+      await authService.register(name, email, password, roleId);
       setUser(await authService.me());
     },
     logout: async () => {

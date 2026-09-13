@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { users, roles } from "@/db/schema";
+import { users, roles, projects } from "@/db/schema";
 import { requirePermission } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit";
 import { updateUserSchema } from "@/lib/validation/users";
@@ -97,5 +97,34 @@ export async function PATCH(req: Request, { params }: Params) {
 
     const updated = await loadUserWithRole(id);
     return toSafeUser(updated!);
+  });
+}
+
+export async function DELETE(_req: Request, { params }: Params) {
+  return withApiErrors(async () => {
+    const actingUserId = await requirePermission("users", "delete");
+    const { id } = await params;
+
+    if (id === actingUserId) {
+      throw new ApiError(400, "SELF_DELETE", "You cannot delete your own account.");
+    }
+
+    const current = await loadUserWithRole(id);
+    if (!current) throw new ApiError(404, "NOT_FOUND", "User not found.");
+
+    // Projects cascade-delete with their creator at the database level, so a user who created
+    // projects can't be hard-deleted without wiping that project data — block it instead.
+    const [{ value: ownedProjects }] = await db.select({ value: count() }).from(projects).where(eq(projects.createdBy, id));
+    if (ownedProjects > 0) {
+      throw new ApiError(
+        409,
+        "USER_OWNS_PROJECTS",
+        `"${current.user.name}" created ${ownedProjects} project(s). Delete or hand off those projects before deleting this account, or deactivate it instead.`
+      );
+    }
+
+    await db.delete(users).where(eq(users.id, id));
+    await logAudit(actingUserId, "user.deleted", `Deleted user "${current.user.name}" (${current.user.email})`);
+    return { success: true };
   });
 }

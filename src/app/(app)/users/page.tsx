@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Users as UsersIcon, Pencil, KeyRound, ShieldCheck, Power } from "lucide-react";
-import { useUsers, useSetUserStatus } from "@/hooks/useUsers";
+import { Plus, Users as UsersIcon, Pencil, KeyRound, ShieldCheck, Power, Trash2 } from "lucide-react";
+import { useUsers, useSetUserStatus, useDeleteUser } from "@/hooks/useUsers";
 import { useRoles } from "@/hooks/useRoles";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/context/AuthContext";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/context/ToastContext";
+import { ApiClientError } from "@/services/apiClient";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -28,9 +30,11 @@ export default function UsersPage() {
   const { data: users, isLoading } = useUsers();
   const { data: roles } = useRoles();
   const { can } = usePermissions();
+  const { user: currentUser } = useAuth();
   const confirm = useConfirm();
   const showToast = useToast();
   const setStatus = useSetUserStatus();
+  const deleteUser = useDeleteUser();
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
@@ -45,6 +49,7 @@ export default function UsersPage() {
   const canCreate = can("users", "create");
   const canEdit = can("users", "edit");
   const canDeactivate = can("users", "delete") || canEdit;
+  const canHardDelete = can("users", "delete");
 
   const filtered = useMemo(() => {
     const list = users ?? [];
@@ -75,6 +80,22 @@ export default function UsersPage() {
     if (!ok) return;
     await setStatus.mutateAsync({ id: user.id, status: activating ? "Active" : "Inactive" });
     showToast(activating ? "User activated" : "User deactivated");
+  }
+
+  async function handleDelete(user: ManagedUser) {
+    const ok = await confirm({
+      title: `Delete ${user.name}?`,
+      description: "This permanently removes their account. This cannot be undone.",
+      confirmLabel: "Delete user",
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await deleteUser.mutateAsync(user.id);
+      showToast("User deleted");
+    } catch (err) {
+      showToast(err instanceof ApiClientError ? err.message : "Could not delete user.", "error");
+    }
   }
 
   return (
@@ -172,6 +193,13 @@ export default function UsersPage() {
                           <Tooltip label={u.status === "Active" ? "Deactivate" : "Activate"}>
                             <Button variant="icon" size="sm" onClick={() => handleToggleStatus(u)} aria-label="Toggle status">
                               <Power className="size-4" />
+                            </Button>
+                          </Tooltip>
+                        )}
+                        {canHardDelete && u.id !== currentUser?.id && (
+                          <Tooltip label="Delete user">
+                            <Button variant="icon" size="sm" onClick={() => handleDelete(u)} aria-label="Delete user">
+                              <Trash2 className="size-4" />
                             </Button>
                           </Tooltip>
                         )}

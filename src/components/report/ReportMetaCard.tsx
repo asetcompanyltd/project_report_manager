@@ -47,7 +47,7 @@ export function ReportMetaCard({
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-slate-300 bg-slate-50 text-[11px] text-slate-400">
+        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-slate-300 bg-slate-50 text-[11px] text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500">
           {report.meta.logo ? (
             // Uploaded logo is an arbitrary data: URL, not a static asset next/image can optimize.
             // eslint-disable-next-line @next/next/no-img-element
@@ -69,14 +69,14 @@ export function ReportMetaCard({
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 rounded-lg bg-indigo-50 px-4 py-3.5 sm:flex-row sm:items-center">
-        <span className="text-sm font-medium text-indigo-900">
-          Overall Progress <span className="font-normal text-indigo-600">(auto-calculated from phases below)</span>
+      <div className="mt-5 flex flex-col gap-3 rounded-lg bg-indigo-50 px-4 py-3.5 sm:flex-row sm:items-center dark:bg-indigo-500/10">
+        <span className="text-sm font-medium text-indigo-900 dark:text-indigo-300">
+          Overall Progress <span className="font-normal text-indigo-600 dark:text-indigo-400">(auto-calculated from phases below)</span>
         </span>
-        <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/70">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/70 dark:bg-slate-900/60">
           <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${overall}%` }} />
         </div>
-        <b className="text-sm font-bold text-indigo-900">{overall}% Complete</b>
+        <b className="text-sm font-bold text-indigo-900 dark:text-indigo-300">{overall}% Complete</b>
       </div>
     </Card>
   );

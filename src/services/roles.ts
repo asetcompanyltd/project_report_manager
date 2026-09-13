@@ -21,6 +21,12 @@ export interface RolePermissionRow {
   canDelete: boolean;
 }
 
+export interface PublicRole {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export interface CreateRoleInput {
   name: string;
   description?: string;
@@ -37,6 +43,7 @@ export interface ModulePermissionInput {
 
 export const rolesService = {
   list: () => api.get<Role[]>("/api/roles"),
+  listPublic: () => api.get<PublicRole[]>("/api/roles/public"),
   get: (id: string) => api.get<Role>(`/api/roles/${id}`),
   create: (input: CreateRoleInput) => api.post<Role>("/api/roles", input),
   update: (id: string, input: Partial<CreateRoleInput>) => api.patch<Role>(`/api/roles/${id}`, input),

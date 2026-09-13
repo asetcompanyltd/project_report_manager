@@ -81,7 +81,7 @@ export default function ProjectWorkspacePage() {
 
   if (error || !report) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
         {error ?? "Report not found."}
       </div>
     );
@@ -93,8 +93,8 @@ export default function ProjectWorkspacePage() {
 
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{project?.name ?? "Project"}</h1>
-          <p className="mt-1 text-sm text-slate-500">Update your project status here, then export a formatted Word document or PDF.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{project?.name ?? "Project"}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Update your project status here, then export a formatted Word document or PDF.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={handleCopySummary}>
@@ -128,7 +128,7 @@ export default function ProjectWorkspacePage() {
         ))}
         <button
           onClick={handleAddPhaseDetail}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-white py-4 text-sm font-semibold text-slate-500 transition-colors hover:border-indigo-400 hover:text-indigo-600"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-white py-4 text-sm font-semibold text-slate-500 transition-colors hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
         >
           <Plus className="size-4" />
           Add phase detail section
@@ -151,9 +151,19 @@ export default function ProjectWorkspacePage() {
 function SaveStatusPill({ status }: { status: "idle" | "saving" | "saved" | "failed" }) {
   if (status === "idle") return null;
   const config = {
-    saving: { icon: Loader2, text: "Saving…", classes: "bg-slate-100 text-slate-500", spin: true },
-    saved: { icon: CheckCircle2, text: "All changes saved", classes: "bg-emerald-50 text-emerald-700", spin: false },
-    failed: { icon: AlertCircle, text: "Save failed — check your connection", classes: "bg-red-50 text-red-700", spin: false },
+    saving: { icon: Loader2, text: "Saving…", classes: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400", spin: true },
+    saved: {
+      icon: CheckCircle2,
+      text: "All changes saved",
+      classes: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
+      spin: false,
+    },
+    failed: {
+      icon: AlertCircle,
+      text: "Save failed — check your connection",
+      classes: "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400",
+      spin: false,
+    },
   }[status];
   const Icon = config.icon;
   return (

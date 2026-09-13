@@ -50,6 +50,7 @@ export const usersService = {
   create: (input: CreateUserInput) => api.post<ManagedUser>("/api/users", input),
   update: (id: string, input: UpdateUserInput) => api.patch<ManagedUser>(`/api/users/${id}`, input),
   setStatus: (id: string, status: UserStatus) => api.patch<ManagedUser>(`/api/users/${id}`, { status }),
+  remove: (id: string) => api.delete<{ success: boolean }>(`/api/users/${id}`),
   resetPassword: (id: string, password: string) => api.post<{ success: boolean }>(`/api/users/${id}/reset-password`, { password }),
   getPermissions: (id: string) => api.get<{ effective: PermissionMatrix; overrides: unknown[] }>(`/api/users/${id}/permissions`),
   updatePermissions: (id: string, overrides: PermissionOverrideInput[]) =>

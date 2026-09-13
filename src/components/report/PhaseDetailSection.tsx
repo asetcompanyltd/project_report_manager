@@ -36,26 +36,26 @@ export function PhaseDetailSection({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
         <div className="flex min-w-0 items-center gap-2">
           <select
             value={phaseDetail.phaseId ?? ""}
             onChange={(e) => workspace.linkPhaseDetail(phaseDetail.id, e.target.value)}
-            className="!w-auto max-w-[220px] !border-0 !bg-transparent !p-0 !text-sm !font-semibold !text-slate-800 !shadow-none focus-visible:!ring-0"
+            className="!w-auto max-w-[220px] !border-0 !bg-transparent !p-0 !text-sm !font-semibold !text-slate-800 !shadow-none focus-visible:!ring-0 dark:!text-slate-100"
           >
             {!phases.some((p) => p.id === phaseDetail.phaseId) && (
-              <option value="" disabled>
+              <option value="" disabled className="dark:bg-slate-800 dark:text-slate-100">
                 Select a phase…
               </option>
             )}
             {phases.map((p) => (
-              <option key={p.id} value={p.id}>
+              <option key={p.id} value={p.id} className="dark:bg-slate-800 dark:text-slate-100">
                 {p.name}
               </option>
             ))}
           </select>
-          <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-slate-400">Site Detail</span>
+          <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">Site Detail</span>
         </div>
         <div className="flex gap-0.5">
           <Tooltip label="Move up">

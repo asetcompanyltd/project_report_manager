@@ -23,18 +23,18 @@ export function HistoryCard({ report, workspace }: { report: Report; workspace: 
   return (
     <Card title="History" noPadding>
       <details className="group px-5 py-4">
-        <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-slate-700 marker:content-none">
+        <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-slate-700 marker:content-none dark:text-slate-300">
           <span>Show change history ({report.changeLog.length})</span>
-          <ChevronDown className="size-4 text-slate-400 transition-transform group-open:rotate-180" />
+          <ChevronDown className="size-4 text-slate-400 transition-transform group-open:rotate-180 dark:text-slate-500" />
         </summary>
         <div className="mt-4 max-h-72 overflow-y-auto">
           {report.changeLog.length === 0 ? (
-            <p className="py-2 text-sm text-slate-400">No changes logged yet. Status and progress updates will appear here.</p>
+            <p className="py-2 text-sm text-slate-400 dark:text-slate-500">No changes logged yet. Status and progress updates will appear here.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {report.changeLog.map((entry) => (
-                <li key={entry.id} className="flex flex-col gap-0.5 py-2 text-sm text-slate-700 sm:flex-row sm:gap-3">
-                  <span className="shrink-0 text-xs text-slate-400 sm:w-40">{new Date(entry.ts).toLocaleString()}</span>
+                <li key={entry.id} className="flex flex-col gap-0.5 py-2 text-sm text-slate-700 sm:flex-row sm:gap-3 dark:text-slate-300">
+                  <span className="shrink-0 text-xs text-slate-400 sm:w-40 dark:text-slate-500">{new Date(entry.ts).toLocaleString()}</span>
                   <span>{entry.message}</span>
                 </li>
               ))}

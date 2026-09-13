@@ -95,11 +95,11 @@ export function SnapshotsCard({ report, workspace }: { report: Report; workspace
           {[...report.snapshots].reverse().map((snap) => (
             <div
               key={snap.id}
-              className="flex flex-col gap-3 rounded-lg border border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-lg border border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-800">{snap.label}</p>
-                <p className="text-xs text-slate-400">{new Date(snap.createdAt).toLocaleString()}</p>
+                <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{snap.label}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">{new Date(snap.createdAt).toLocaleString()}</p>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <Tooltip label="Load this version">

@@ -25,7 +25,7 @@ export function SiteBlock({
   const overdue = isOverdue(site.targetDate, site.status);
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-4">
+    <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-800/40">
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex gap-0.5 pb-2">
           <Tooltip label="Move up">

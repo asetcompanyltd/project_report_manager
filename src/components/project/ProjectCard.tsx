@@ -26,9 +26,9 @@ export function ProjectCard({
   const canDelete = project.role === "owner";
 
   return (
-    <div className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+    <div className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-start justify-between gap-2">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+        <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
           <FolderKanban className="size-[18px]" />
         </span>
         {(canEdit || canDelete) && (
@@ -36,7 +36,7 @@ export function ProjectCard({
             <DropdownMenu.Trigger asChild>
               <button
                 aria-label="Project actions"
-                className="rounded-md border border-slate-200 p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 data-[state=open]:bg-slate-100"
+                className="rounded-md border border-slate-200 p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 data-[state=open]:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 dark:data-[state=open]:bg-slate-800"
               >
                 <MoreVertical className="size-4" />
               </button>
@@ -45,12 +45,12 @@ export function ProjectCard({
               <DropdownMenu.Content
                 align="end"
                 sideOffset={6}
-                className="z-[100] w-40 rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg"
+                className="z-[100] w-40 rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-800"
               >
                 {canEdit && (
                   <DropdownMenu.Item
                     onSelect={() => onEdit(project)}
-                    className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-slate-600 outline-none data-[highlighted]:bg-slate-100"
+                    className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-slate-600 outline-none data-[highlighted]:bg-slate-100 dark:text-slate-300 dark:data-[highlighted]:bg-slate-700"
                   >
                     <Pencil className="size-3.5" />
                     Edit
@@ -59,7 +59,7 @@ export function ProjectCard({
                 {canDelete && (
                   <DropdownMenu.Item
                     onSelect={() => onDelete(project)}
-                    className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-red-600 outline-none data-[highlighted]:bg-red-50"
+                    className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-red-600 outline-none data-[highlighted]:bg-red-50 dark:text-red-400 dark:data-[highlighted]:bg-red-500/10"
                   >
                     <Trash2 className="size-3.5" />
                     Delete
@@ -71,15 +71,15 @@ export function ProjectCard({
         )}
       </div>
 
-      <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400">{project.code}</p>
-      <h3 className="mt-0.5 truncate text-base font-bold text-slate-900">{project.name}</h3>
-      <p className="mt-1.5 line-clamp-2 flex-1 text-sm text-slate-500">{project.description || "No description."}</p>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{project.code}</p>
+      <h3 className="mt-0.5 truncate text-base font-bold text-slate-900 dark:text-slate-100">{project.name}</h3>
+      <p className="mt-1.5 line-clamp-2 flex-1 text-sm text-slate-500 dark:text-slate-400">{project.description || "No description."}</p>
 
       <div className="mt-4 flex items-center justify-between">
         <Badge color={STATUS_COLOR[project.status]}>{project.status}</Badge>
         <Link
           href={`/projects/${project.id}`}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
         >
           Open
           <ArrowUpRight className="size-3.5" />

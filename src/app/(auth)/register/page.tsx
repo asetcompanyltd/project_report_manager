@@ -1,11 +1,12 @@
 ﻿"use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, FileBarChart2, ShieldCheck, FolderKanban, GitBranch } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ApiClientError } from "@/services/apiClient";
+import { rolesService, type PublicRole } from "@/services/roles";
 import { Button } from "@/components/ui/Button";
 
 const HIGHLIGHTS = [
@@ -21,10 +22,25 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [roleId, setRoleId] = useState("");
+  const [roles, setRoles] = useState<PublicRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const passwordTooShort = password.length > 0 && password.length < 8;
+
+  useEffect(() => {
+    rolesService
+      .listPublic()
+      .then((data) => {
+        setRoles(data);
+        setRoleId((current) => current || data[0]?.id || "");
+      })
+      .catch(() => setRolesError("Could not load roles. Please refresh the page."))
+      .finally(() => setRolesLoading(false));
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -33,9 +49,13 @@ export default function RegisterPage() {
       setError("Password must be at least 8 characters.");
       return;
     }
+    if (!roleId) {
+      setError("Please select a role.");
+      return;
+    }
     setSubmitting(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, roleId);
       router.push("/projects");
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Registration failed.");
@@ -161,7 +181,31 @@ export default function RegisterPage() {
               {passwordTooShort && <p className="mt-1.5 text-xs font-medium text-amber-600">At least 8 characters required.</p>}
             </div>
 
-            <Button type="submit" variant="primary" size="lg" loading={submitting} className="w-full">
+            <div>
+              <label htmlFor="role" className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                Role
+              </label>
+              <select
+                id="role"
+                value={roleId}
+                onChange={(e) => setRoleId(e.target.value)}
+                required
+                disabled={rolesLoading || roles.length === 0}
+              >
+                <option value="" disabled>
+                  {rolesLoading ? "Loading roles…" : "Select your role"}
+                </option>
+                {roles.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">This determines what you can access after signing up.</p>
+              {rolesError && <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400">{rolesError}</p>}
+            </div>
+
+            <Button type="submit" variant="primary" size="lg" loading={submitting} disabled={rolesLoading} className="w-full">
               {submitting ? "Creating account…" : "Create account"}
             </Button>
           </form>

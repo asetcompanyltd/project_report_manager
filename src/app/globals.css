@@ -13,6 +13,13 @@ html {
 
 html.dark {
   color-scheme: dark;
+  /* Real black theme, not a tinted dark gray: redefine the slate shades used for dark-mode
+     backgrounds/borders as neutral near-black. Every `dark:bg-slate-900` etc. utility across
+     the app reads these same theme variables, so this repaints the whole UI from one place. */
+  --color-slate-950: #000000; /* page background */
+  --color-slate-900: #0a0a0a; /* card / sidebar / topbar / modal / input surfaces */
+  --color-slate-800: #1c1c1c; /* borders, hover backgrounds */
+  --color-slate-700: #2b2b2b; /* secondary borders, dividers */
 }
 
 body {

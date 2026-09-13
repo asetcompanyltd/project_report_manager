@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Settings2, Palette, Users, Bell, Lock, Database } from "lucide-react";
+import { Settings2, Palette, Bell, Lock, Database } from "lucide-react";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { GeneralSection } from "@/components/settings/GeneralSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
-import { UsersAccessSection } from "@/components/settings/UsersAccessSection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { SecuritySection } from "@/components/settings/SecuritySection";
 import { SystemSection } from "@/components/settings/SystemSection";
@@ -13,7 +12,6 @@ import { SystemSection } from "@/components/settings/SystemSection";
 const TABS = [
   { key: "general", label: "General", icon: Settings2, content: GeneralSection },
   { key: "appearance", label: "Appearance", icon: Palette, content: AppearanceSection },
-  { key: "access", label: "Users & Access", icon: Users, content: UsersAccessSection },
   { key: "notifications", label: "Notifications", icon: Bell, content: NotificationsSection },
   { key: "security", label: "Security", icon: Lock, content: SecuritySection },
   { key: "system", label: "System", icon: Database, content: SystemSection },
