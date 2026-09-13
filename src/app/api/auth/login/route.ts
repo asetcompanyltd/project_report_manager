@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       throw new ApiError(401, "INVALID_CREDENTIALS", "Incorrect email or password.");
     }
 
-    await setSessionCookie(user.id);
+    await setSessionCookie(user.id, body.remember);
     return { id: user.id, email: user.email, name: user.name };
   });
 }
