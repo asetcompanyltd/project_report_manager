@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FolderKanban, FileBarChart2, Users, ShieldCheck, Settings } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useBranding } from "@/hooks/useSettings";
 import type { PermissionModule } from "@/types/permissions";
 
 const NAV_ITEMS: { label: string; href: string; icon: typeof FolderKanban; module: PermissionModule }[] = [
@@ -16,6 +17,7 @@ const NAV_ITEMS: { label: string; href: string; icon: typeof FolderKanban; modul
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { can } = usePermissions();
+  const { data: branding } = useBranding();
 
   const visibleItems = NAV_ITEMS.filter((item) => can(item.module, "view"));
 
@@ -26,8 +28,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <FileBarChart2 className="size-5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">Report Manager</p>
-          <p className="text-[11px] text-slate-400 dark:text-slate-500">Multi-project workspace</p>
+          <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">{branding?.systemName ?? "Report Manager"}</p>
+          <p className="truncate text-[11px] text-slate-400 dark:text-slate-500">{branding?.companyName || "Multi-project workspace"}</p>
         </div>
       </div>
 

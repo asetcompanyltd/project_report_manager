@@ -52,8 +52,14 @@ export interface UpdateSettingsInput {
   values: SettingsValues;
 }
 
+export interface Branding {
+  systemName: string;
+  companyName: string;
+}
+
 export const settingsService = {
   get: () => api.get<AllSettings>("/api/settings"),
   update: (input: UpdateSettingsInput) => api.patch<{ key: SettingsKey; values: SettingsValues }>("/api/settings", input),
   auditLog: (page = 1) => api.get<{ entries: AuditLogEntry[]; page: number; pageSize: number }>(`/api/audit-log?page=${page}`),
+  getBranding: () => api.get<Branding>("/api/settings/branding"),
 };
