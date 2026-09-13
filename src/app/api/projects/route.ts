@@ -1,7 +1,8 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { projects, projectMembers, reports } from "@/db/schema";
-import { requirePermission } from "@/lib/permissions";
+import { requirePermission, getEffectivePermissions } from "@/lib/permissions";
+import { implicitProjectRole } from "@/lib/authz";
 import { createProjectSchema } from "@/lib/validation/project";
 import { ApiError, withApiErrors } from "@/lib/api-response";
 import { newId } from "@/utils/id";
@@ -9,14 +10,22 @@ import { newId } from "@/utils/id";
 export async function GET() {
   return withApiErrors(async () => {
     const userId = await requirePermission("projects", "view");
-    const rows = await db
-      .select({ project: projects, role: projectMembers.role })
-      .from(projectMembers)
-      .innerJoin(projects, eq(projectMembers.projectId, projects.id))
-      .where(eq(projectMembers.userId, userId))
-      .orderBy(desc(projects.updatedAt));
 
-    return rows.map((r) => ({ ...r.project, role: r.role }));
+    // Every account with projects:view sees every project in the system, the same way a
+    // Project Manager does — an explicit project_members row (if any) overrides the role that
+    // would otherwise be implied by the account's global permissions; see requireProjectAccess.
+    const [allProjects, memberships, permissions] = await Promise.all([
+      db.select().from(projects).orderBy(desc(projects.updatedAt)),
+      db.select().from(projectMembers).where(eq(projectMembers.userId, userId)),
+      getEffectivePermissions(userId),
+    ]);
+
+    const membershipRole = new Map(memberships.map((m) => [m.projectId, m.role]));
+    const fallbackRole = implicitProjectRole(permissions.projects);
+
+    return allProjects
+      .map((p) => ({ ...p, role: membershipRole.get(p.id) ?? fallbackRole }))
+      .filter((p): p is typeof p & { role: NonNullable<typeof p.role> } => p.role !== null);
   });
 }
 
