@@ -36,7 +36,7 @@ export function ProjectCard({
             <DropdownMenu.Trigger asChild>
               <button
                 aria-label="Project actions"
-                className="rounded-md p-1.5 text-slate-400 opacity-0 transition-opacity hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
+                className="rounded-md border border-slate-200 p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 data-[state=open]:bg-slate-100"
               >
                 <MoreVertical className="size-4" />
               </button>
