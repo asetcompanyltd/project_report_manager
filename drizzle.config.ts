@@ -1,0 +1,14 @@
+import { defineConfig } from "drizzle-kit";
+import { loadEnvLocal } from "./scripts/env";
+
+loadEnvLocal();
+
+export default defineConfig({
+  schema: "./src/db/schema.ts",
+  out: "./src/db/migrations",
+  dialect: "turso",
+  dbCredentials: {
+    url: process.env.DATABASE_URL ?? "file:./local.db",
+    authToken: process.env.DATABASE_AUTH_TOKEN,
+  },
+});
