@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileBarChart2 } from "lucide-react";
+import { FolderKanban, FileBarChart2 } from "lucide-react";
 
-const NAV_ITEMS = [{ label: "Dashboard", href: "/projects", icon: LayoutDashboard }];
+const NAV_ITEMS = [{ label: "Projects", href: "/projects", icon: FolderKanban }];
 
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();

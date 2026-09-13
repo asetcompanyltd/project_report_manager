@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FolderKanban, CheckCircle2, PauseCircle, Archive, Plus, LayoutGrid } from "lucide-react";
+import { FolderKanban, Plus } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectContext } from "@/context/ProjectContext";
 import { ProjectCard } from "@/components/project/ProjectCard";
@@ -36,17 +36,6 @@ export default function ProjectsPage() {
     router.push(`/projects/${id}`);
   }
 
-  const stats = useMemo(() => {
-    const list = projects ?? [];
-    return {
-      total: list.length,
-      active: list.filter((p) => p.status === "Active").length,
-      onHold: list.filter((p) => p.status === "On Hold").length,
-      completed: list.filter((p) => p.status === "Completed").length,
-      archived: list.filter((p) => p.status === "Archived").length,
-    };
-  }, [projects]);
-
   const filtered = useMemo(() => {
     const list = projects ?? [];
     const term = search.trim().toLowerCase();
@@ -74,7 +63,7 @@ export default function ProjectsPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
           <p className="mt-1 text-sm text-slate-500">Create and switch between independent projects — each keeps its own data.</p>
         </div>
         <Button variant="primary" onClick={() => setShowNew(true)}>
@@ -82,14 +71,6 @@ export default function ProjectsPage() {
           New Project
         </Button>
       </header>
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <StatTile icon={LayoutGrid} label="Total Projects" value={stats.total} color="bg-indigo-50 text-indigo-600" />
-        <StatTile icon={FolderKanban} label="Active" value={stats.active} color="bg-emerald-50 text-emerald-600" />
-        <StatTile icon={PauseCircle} label="On Hold" value={stats.onHold} color="bg-amber-50 text-amber-600" />
-        <StatTile icon={CheckCircle2} label="Completed" value={stats.completed} color="bg-blue-50 text-blue-600" />
-        <StatTile icon={Archive} label="Archived" value={stats.archived} color="bg-slate-100 text-slate-500" />
-      </div>
 
       {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Could not load projects.</div>}
 
@@ -150,28 +131,6 @@ export default function ProjectsPage() {
       <NewProjectDialog open={showNew} onClose={() => setShowNew(false)} onCreated={openProject} />
       <EditProjectDialog project={editing} onClose={() => setEditing(null)} />
       <DeleteProjectDialog project={deleting} onClose={() => setDeleting(null)} onDeleted={() => setDeleting(null)} />
-    </div>
-  );
-}
-
-function StatTile({
-  icon: Icon,
-  label,
-  value,
-  color,
-}: {
-  icon: typeof FolderKanban;
-  label: string;
-  value: number;
-  color: string;
-}) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <span className={`flex size-8 items-center justify-center rounded-lg ${color}`}>
-        <Icon className="size-4" />
-      </span>
-      <p className="mt-3 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
     </div>
   );
 }

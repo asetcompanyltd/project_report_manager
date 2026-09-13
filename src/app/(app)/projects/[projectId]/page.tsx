@@ -73,7 +73,7 @@ export default function ProjectWorkspacePage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Breadcrumbs items={[{ label: "Dashboard", href: "/projects" }, { label: "Loading…" }]} />
+        <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: "Loading…" }]} />
         <WorkspaceSkeleton />
       </div>
     );
@@ -89,7 +89,7 @@ export default function ProjectWorkspacePage() {
 
   return (
     <div className="space-y-6 pb-10">
-      <Breadcrumbs items={[{ label: "Dashboard", href: "/projects" }, { label: project?.name ?? "Project" }]} />
+      <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: project?.name ?? "Project" }]} />
 
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
