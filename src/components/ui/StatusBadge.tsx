@@ -3,10 +3,10 @@ import type { ItemStatus } from "@/types/report";
 
 const STATUS_OPTIONS: ItemStatus[] = ["Complete", "In Progress", "Not Started"];
 
-const STATUS_TEXT_CLASS: Record<ItemStatus, string> = {
-  Complete: "text-emerald-700",
-  "In Progress": "text-amber-700",
-  "Not Started": "text-slate-500",
+const STATUS_BADGE_CLASS: Record<ItemStatus, string> = {
+  Complete: "!bg-emerald-100 !text-emerald-800",
+  "In Progress": "!bg-orange-100 !text-orange-800",
+  "Not Started": "!bg-slate-200 !text-slate-600",
 };
 
 export function StatusSelect({
@@ -18,12 +18,12 @@ export function StatusSelect({
 }) {
   return (
     <select
-      className={`!py-1.5 font-semibold ${STATUS_TEXT_CLASS[value]}`}
+      className={`!w-auto !rounded-full !border-0 !py-1.5 !pl-3 !pr-7 !text-xs !font-bold !shadow-none cursor-pointer ${STATUS_BADGE_CLASS[value]}`}
       value={value}
       onChange={(e) => onChange(e.target.value as ItemStatus)}
     >
       {STATUS_OPTIONS.map((s) => (
-        <option key={s} value={s} className="text-slate-900">
+        <option key={s} value={s} className="bg-white font-normal text-slate-900">
           {s}
         </option>
       ))}
