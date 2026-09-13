@@ -2,7 +2,8 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const COOKIE_NAME = "wtp_session";
-const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 days
+const DEFAULT_SESSION_SECONDS = 60 * 60 * 24 * 7; // 7 days
+const REMEMBER_SESSION_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 function getSecretKey() {
   const secret = process.env.AUTH_SECRET;
@@ -12,11 +13,11 @@ function getSecretKey() {
   return new TextEncoder().encode(secret);
 }
 
-export async function createSessionToken(userId: string): Promise<string> {
+export async function createSessionToken(userId: string, durationSeconds = DEFAULT_SESSION_SECONDS): Promise<string> {
   return new SignJWT({ sub: userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_DURATION_SECONDS}s`)
+    .setExpirationTime(`${durationSeconds}s`)
     .sign(getSecretKey());
 }
 
@@ -37,15 +38,16 @@ export async function getCurrentUserId(): Promise<string | null> {
   return verifySessionToken(token);
 }
 
-export async function setSessionCookie(userId: string) {
-  const token = await createSessionToken(userId);
+export async function setSessionCookie(userId: string, remember = false) {
+  const duration = remember ? REMEMBER_SESSION_SECONDS : DEFAULT_SESSION_SECONDS;
+  const token = await createSessionToken(userId, duration);
   const store = await cookies();
   store.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_DURATION_SECONDS,
+    maxAge: duration,
   });
 }
 

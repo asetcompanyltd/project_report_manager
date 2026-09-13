@@ -1,35 +1,26 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { ProjectSelector } from "@/components/project/ProjectSelector";
-import { Button } from "@/components/ui/Button";
+import { useState, type ReactNode } from "react";
+import { SidebarContent } from "@/components/layout/SidebarContent";
+import { MobileSidebar } from "@/components/layout/MobileSidebar";
+import { Topbar } from "@/components/layout/Topbar";
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-
-  async function handleLogout() {
-    await logout();
-    router.push("/login");
-  }
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <>
-      <header className="app-header">
-        <Link href="/projects" className="brand">
-          Project Report Manager
-        </Link>
-        <ProjectSelector />
-        <div className="spacer" />
-        {user && <span className="user-name">{user.name}</span>}
-        <Button variant="ghost" onClick={handleLogout}>
-          Log out
-        </Button>
-      </header>
-      {children}
-    </>
+    <div className="flex min-h-screen bg-slate-50">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:block">
+        <SidebarContent />
+      </aside>
+      <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Topbar onMenuClick={() => setMobileOpen(true)} />
+        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+        </main>
+      </div>
+    </div>
   );
 }

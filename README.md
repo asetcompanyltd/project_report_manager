@@ -13,6 +13,10 @@ backed by a relational database (Turso/libSQL-compatible).
   and a Turso `libsql://` database in production; only the `DATABASE_URL` env var changes.
 - **zod** for request validation, **@tanstack/react-query** for the projects list,
   **bcryptjs** + **jose** (JWT cookie) for auth.
+- **Tailwind CSS v4 + Radix UI (Dialog/AlertDialog/DropdownMenu/Tooltip) + lucide-react** — the
+  design system: a sidebar + top bar app shell, a shared set of UI primitives in
+  `src/components/ui/*`, and a promise-based `useConfirm()` hook replacing native
+  `window.confirm()` dialogs everywhere.
 
 ## Getting started (local dev)
 
