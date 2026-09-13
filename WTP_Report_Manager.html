@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upper Ruvu WTP — Report Manager</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-dark:#152A4D;
+    --light-blue:#D9E2F3;
+    --green:#2E7D32;
+    --amber:#B8860B;
+    --red:#C0392B;
+    --grey:#6B7280;
+    --bg:#F5F6F8;
+    --card:#FFFFFF;
+    --border:#E1E4EA;
+    --text:#20242C;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-tap-highlight-color:transparent;
+  }
+  body::before{
+    content:'';position:fixed;top:0;left:0;right:0;height:4px;z-index:200;
+    background:linear-gradient(90deg,var(--navy),var(--light-blue));
+  }
+  .wrap{max-width:min(1440px,92vw);margin:0 auto;padding:28px 20px 40px;}
+  header.top{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:22px;flex-wrap:wrap;gap:12px;
+    position:sticky;top:4px;z-index:60;
+    background:var(--bg);padding:10px 0;
+  }
+  header.top h1{
+    font-size:21px;margin:0 0 4px;color:var(--navy);letter-spacing:.2px;font-weight:700;
+  }
+  header.top p{margin:0;color:var(--grey);font-size:13px;}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;}
+  button{
+    font-family:inherit;cursor:pointer;border:none;border-radius:7px;
+    font-size:13px;font-weight:600;padding:9px 16px;
+    transition:background .15s,transform .1s,box-shadow .15s;
+    white-space:nowrap;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-primary{background:var(--navy);color:#fff;box-shadow:0 1px 2px rgba(31,56,100,.25);}
+  .btn-primary:hover{background:var(--navy-dark);box-shadow:0 2px 6px rgba(31,56,100,.3);}
+  .btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--light-blue);border-color:var(--light-blue);}
+  .btn-icon{
+    background:transparent;color:var(--grey);border:1px solid transparent;
+    padding:5px 8px;font-size:12px;line-height:1;border-radius:6px;
+  }
+  .btn-icon:hover{color:var(--red);border-color:#F2C6C0;background:#FDF1F0;}
+  .btn-icon.up, .btn-icon.down{color:var(--navy);}
+  .btn-icon.up:hover, .btn-icon.down:hover{background:var(--light-blue);border-color:var(--light-blue);color:var(--navy-dark);}
+  .save-note{
+    font-size:12px;font-weight:600;align-self:center;margin-right:2px;
+    text-align:right;padding:5px 10px;border-radius:99px;white-space:nowrap;
+  }
+  .save-note.saving{color:var(--grey);}
+  .save-note.saved{color:var(--green);background:#EAF3EA;}
+  .save-note.failed{color:var(--red);background:#FBEAE8;}
+
+  .save-bar-inline{
+    display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;
+    margin-top:6px;
+  }
+  .btn-save{
+    padding:11px 26px;font-size:13.5px;
+  }
+  .btn-save:hover{
+    background:var(--navy-dark);transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(31,56,100,.35);
+  }
+  .btn-save:active{transform:translateY(0);}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:20px 22px;margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.03);
+  }
+  .card h2{
+    font-size:14px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--navy);margin:0 0 16px;padding-bottom:10px;
+    border-bottom:2px solid var(--light-blue);
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;flex-wrap:wrap;
+  }
+  .card h2 .hint{font-size:11px;text-transform:none;letter-spacing:0;color:var(--grey);font-weight:400;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .grid4{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;}
+  label{display:block;font-size:12px;color:var(--grey);margin-bottom:5px;font-weight:600;}
+  input[type=text], input[type=date], input[type=number], textarea, select{
+    width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;
+    font-size:13px;font-family:inherit;color:var(--text);background:#fff;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  input:focus, textarea:focus, select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px var(--light-blue);}
+  .field{margin-bottom:0;}
+  .overall{
+    display:flex;align-items:center;gap:12px;background:var(--light-blue);
+    padding:12px 14px;border-radius:8px;margin-top:14px;font-size:13px;color:var(--navy-dark);
+    flex-wrap:wrap;
+  }
+  .overall b{font-size:18px;}
+  .overall-track{
+    flex:1;min-width:120px;height:8px;border-radius:99px;background:rgba(255,255,255,.6);
+    overflow:hidden;
+  }
+  .overall-fill{height:100%;border-radius:99px;background:var(--navy);transition:width .3s ease;}
+
+  .logo-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
+  .logo-preview{
+    width:64px;height:64px;border:1px dashed var(--border);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafbfc;
+    font-size:11px;color:var(--grey);text-align:center;padding:4px;
+  }
+  .logo-preview img{max-width:100%;max-height:100%;}
+
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -1px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;}
+  th{
+    background:var(--navy);color:#fff;text-align:left;padding:9px 10px;
+    font-size:12px;font-weight:600;
+  }
+  td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td input, td select{padding:6px 8px;font-size:12.5px;}
+  .status-select{font-weight:600;}
+  .status-Complete{color:var(--green);}
+  .status-In-Progress{color:var(--amber);}
+  .status-Not-Started{color:var(--grey);}
+  .overdue-badge{
+    display:inline-block;margin-top:3px;font-size:10.5px;font-weight:700;color:#fff;
+    background:var(--red);border-radius:4px;padding:1px 6px;
+  }
+  .col-narrow{width:78px;}
+  .col-date{width:130px;}
+  .col-status{width:120px;}
+  .col-move{width:56px;text-align:center;white-space:nowrap;}
+  .col-remove{width:36px;text-align:center;}
+
+  .site-block{margin-bottom:16px;border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .site-block-head{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap;}
+  .site-block-head .field{flex:2;min-width:160px;}
+  .site-items{margin-top:10px;}
+  .item-row{display:flex;gap:8px;margin-bottom:6px;align-items:center;}
+  .item-row input{flex:1;}
+  .add-row{margin-top:8px;}
+  .add-row button{font-size:12px;padding:6px 12px;}
+  .move-group{display:flex;gap:2px;}
+
+  .phase-detail-block{margin-bottom:18px;}
+  .phase-detail-block:last-child{margin-bottom:0;}
+  .phase-select{
+    border:none;background:transparent;padding:0;
+    font-size:14px;text-transform:uppercase;letter-spacing:.6px;font-weight:600;
+    color:var(--navy);font-family:inherit;cursor:pointer;max-width:260px;
+  }
+  .phase-select:focus{outline:none;}
+  .phase-suffix{
+    font-size:14px;text-transform:uppercase;letter-spacing:.6px;font-weight:600;
+    color:var(--navy);white-space:nowrap;
+  }
+  .phase-detail-head{display:flex;align-items:center;gap:6px;min-width:0;}
+
+  .list-editor .item-row{margin-bottom:8px;}
+  textarea{min-height:60px;resize:vertical;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:8px;
+    font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;
+    max-width:90vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.2);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  details.history{border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
+  details.history summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--navy);outline:none;}
+  .log-entry{font-size:12.5px;color:var(--text);border-bottom:1px solid var(--border);padding:6px 0;}
+  .log-entry .ts{color:var(--grey);font-size:11px;margin-right:8px;}
+  .log-empty{color:var(--grey);font-size:12.5px;padding:8px 0;}
+  .history-actions{margin-top:10px;}
+
+  .snapshot-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:8px;
+  }
+  .snapshot-meta{font-size:12.5px;}
+  .snapshot-meta b{color:var(--navy);}
+  .snapshot-meta .ts{color:var(--grey);font-size:11px;display:block;}
+  .snapshot-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .snapshot-actions button{padding:6px 10px;font-size:12px;}
+  .empty-note{color:var(--grey);font-size:12.5px;}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(20,25,35,.45);display:none;
+    align-items:center;justify-content:center;z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:10px;padding:20px 22px;width:340px;max-width:90vw;}
+  .modal h3{margin:0 0 12px;font-size:15px;color:var(--navy);}
+  .modal input{margin-bottom:14px;}
+  .modal-btns{display:flex;justify-content:flex-end;gap:8px;}
+
+  @media (max-width:900px){
+    .grid4{grid-template-columns:1fr 1fr;}
+  }
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 32px;}
+    header.top{flex-direction:column;align-items:stretch;gap:10px;}
+    header.top h1{font-size:19px;}
+    .actions{flex-direction:column;align-items:stretch;width:100%;}
+    .actions button{width:100%;}
+    .save-bar-inline{flex-direction:column;align-items:stretch;}
+    .save-bar-inline button{width:100%;}
+    .save-note{text-align:center;}
+    .card{padding:16px;}
+    .card h2{font-size:13px;}
+    .grid2, .grid3, .grid4{grid-template-columns:1fr;}
+    .overall{flex-direction:column;align-items:stretch;}
+    .overall-track{width:100%;}
+    input[type=text], input[type=date], input[type=number], textarea, select{font-size:16px;}
+    td input, td select{font-size:14px;}
+    .site-block-head{flex-direction:column;align-items:stretch;gap:8px;}
+    .site-block-head .field{width:100%;min-width:0;}
+    .site-block-head > button{align-self:flex-end;}
+    .snapshot-row{flex-direction:column;align-items:stretch;}
+    .snapshot-actions{justify-content:flex-end;flex-wrap:wrap;}
+    .phase-select{max-width:100%;}
+    .phase-detail-head{flex-wrap:wrap;}
+    .modal{padding:18px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Project Report Manager</h1>
+      <p>Update your project status here, then export a formatted Word document or PDF.</p>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" id="copySummaryBtn">Copy Summary</button>
+      <button class="btn-ghost" id="exportPdfBtn">Export PDF</button>
+      <button class="btn-primary" id="downloadBtn">Download Word Document</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>Report Details</h2>
+    <div class="grid4">
+      <div class="field">
+        <label>Report Title</label>
+        <input type="text" id="metaTitle">
+      </div>
+      <div class="field">
+        <label>Subtitle</label>
+        <input type="text" id="metaSubtitle">
+      </div>
+      <div class="field">
+        <label>Report Date</label>
+        <input type="date" id="metaDate">
+      </div>
+      <div class="field">
+        <label>Prepared By</label>
+        <input type="text" id="metaPreparedBy">
+      </div>
+    </div>
+
+    <div class="logo-row">
+      <div class="logo-preview" id="logoPreview">No logo</div>
+      <button class="btn-ghost" id="uploadLogoBtn">Upload logo</button>
+      <button class="btn-icon" id="removeLogoBtn" title="Remove logo" style="display:none;">Remove</button>
+      <input type="file" id="logoInput" accept="image/*" style="display:none;">
+    </div>
+
+    <div class="overall">
+      <span>Overall Project Progress (auto-calculated from phase progress below)</span>
+      <div class="overall-track"><div class="overall-fill" id="overallFill" style="width:0%"></div></div>
+      <b id="overallPct">0%</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Project Phase Status</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-move"></th>
+            <th>Phase</th>
+            <th class="col-status">Status</th>
+            <th class="col-narrow">Progress %</th>
+            <th class="col-date">Target Date</th>
+            <th>Remarks</th>
+            <th class="col-remove"></th>
+          </tr>
+        </thead>
+        <tbody id="phasesBody"></tbody>
+      </table>
+    </div>
+    <div class="add-row"><button class="btn-ghost" id="addPhaseBtn">+ Add phase</button></div>
+  </div>
+
+  <div id="phaseDetailsContainer"></div>
+  <div class="card">
+    <div class="add-row" style="margin-top:0;"><button class="btn-primary" id="addPhaseDetailBtn">+ Add phase detail section</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Next Steps</h2>
+    <div class="list-editor" id="nextStepsContainer"></div>
+    <div class="add-row"><button class="btn-ghost" id="addStepBtn">+ Add next step</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Notes</h2>
+    <textarea id="notesField"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>Saved Versions <span class="hint">Snapshot the report at key milestones, and reload or export any of them later</span></h2>
+    <div id="snapshotsContainer"></div>
+    <div class="add-row"><button class="btn-primary" id="saveVersionBtn">+ Save current as new version</button></div>
+  </div>
+
+  <div class="card">
+    <h2>History</h2>
+    <details class="history" id="historyDetails">
+      <summary>Show change history</summary>
+      <div id="historyList" style="margin-top:10px;"></div>
+      <div class="history-actions">
+        <button class="btn-ghost" id="clearHistoryBtn">Clear history</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Data</h2>
+    <div class="add-row" style="margin-top:0;">
+      <button class="btn-ghost" id="exportJsonBtn">Export Data (JSON)</button>
+      <button class="btn-ghost" id="importJsonBtn">Import Data (JSON)</button>
+      <button class="btn-ghost" id="resetBtn">Reset to sample data</button>
+      <input type="file" id="importJsonInput" accept="application/json,.json" style="display:none;">
+    </div>
+  </div>
+
+  <div class="save-bar-inline">
+    <span class="save-note" id="saveNote"></span>
+    <button class="btn-primary btn-save" id="saveNowBtn">Save Now</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="promptOverlay">
+  <div class="modal">
+    <h3 id="promptTitle">Name this version</h3>
+    <input type="text" id="promptInput" placeholder="e.g. Week 12 update">
+    <div class="modal-btns">
+      <button class="btn-ghost" id="promptCancel">Cancel</button>
+      <button class="btn-primary" id="promptOk">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'wtp-report-data';
+const SNAPSHOTS_KEY = 'wtp-snapshots';
+let data = null;
+let snapshots = [];
+let saveTimer = null;
+
+const defaultData = {
+  meta: {
+    title: "UPPER RUVU WATER TREATMENT PLANT (WTP)",
+    subtitle: "Instrumentation & Control System Project",
+    reportDate: "2026-07-29",
+    preparedBy: "",
+    logo: null
+  },
+  phases: [
+    { id: "phase-install", name: "Installation Phase", status: "In Progress", progress: 75, targetDate: "2026-08-15", remarks: "Intake WTP complete; High Lift WTP ongoing" },
+    { id: "phase-config", name: "Configuration Phase", status: "Not Started", progress: 0, targetDate: "2026-08-29", remarks: "Begins after installation sign-off" },
+    { id: "phase-test", name: "Testing Phase", status: "Not Started", progress: 0, targetDate: "2026-09-12", remarks: "Includes functional & integration testing" },
+    { id: "phase-training", name: "Training and Commissioning", status: "Not Started", progress: 0, targetDate: "2026-09-26", remarks: "Final phase prior to handover" }
+  ],
+  phaseDetails: [
+    {
+      phaseId: "phase-install",
+      sites: [
+        {
+          name: "Intake Raw Water WTP",
+          status: "Complete",
+          progress: 100,
+          targetDate: "Completed",
+          items: ["Level Sensor & Transmitter", "Flowmeter Converter & Transmitter", "Pressure Transmitters (3 units) & Hub", "Local Gateway & HMI Panel Box"]
+        },
+        {
+          name: "High Lift Clear Water WTP",
+          status: "In Progress",
+          progress: 50,
+          targetDate: "2026-08-15",
+          items: ["Pressure Transmitter Wiring", "Remote Gateway & HMI Panel Box"]
+        }
+      ]
+    }
+  ],
+  nextSteps: [
+    "Complete pressure transmitter wiring and remote gateway/HMI panel installation at High Lift Clear Water WTP.",
+    "Finalize Installation Phase sign-off ahead of the Configuration Phase.",
+    "Proceed to system configuration, followed by functional and integration testing.",
+    "Schedule Training and Commissioning activities with site operations staff."
+  ],
+  notes: "Progress percentages and target dates in this report are current estimates for stakeholder planning purposes and should be updated as work proceeds and confirmed schedules become available.",
+  changeLog: []
+};
+
+let idCounter = 0;
+function genId(prefix){
+  idCounter += 1;
+  return prefix + '_' + Date.now().toString(36) + '_' + idCounter;
+}
+
+const localStorageBackend = {
+  async get(key){
+    let raw = null;
+    try{ raw = localStorage.getItem(key); }catch(e){ raw = null; }
+    return raw == null ? null : { value: raw };
+  },
+  async set(key, value){
+    localStorage.setItem(key, value);
+  }
+};
+const storage = (typeof window.storage !== 'undefined' && window.storage) ? window.storage : localStorageBackend;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function todayISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+async function loadData(){
+  try{
+    const res = await storage.get(STORAGE_KEY, false);
+    data = res ? JSON.parse(res.value) : JSON.parse(JSON.stringify(defaultData));
+  }catch(e){
+    data = JSON.parse(JSON.stringify(defaultData));
+  }
+  if(!data.changeLog) data.changeLog = [];
+  if(!('logo' in data.meta)) data.meta.logo = null;
+  data.phases.forEach(function(p){ if(!p.id) p.id = genId('phase'); });
+  if(!data.phaseDetails){
+    data.phaseDetails = [{ phaseId: (data.phases[0] && data.phases[0].id) || genId('phase'), sites: data.sites || [] }];
+    delete data.sites;
+  }else{
+    data.phaseDetails.forEach(function(pd){
+      if(pd.phaseId === undefined){
+        const cleanName = (pd.title || '').replace(/\s*—\s*Site Detail\s*$/i, '').trim();
+        const match = data.phases.find(function(p){ return p.name === cleanName; });
+        pd.phaseId = match ? match.id : ((data.phases[0] && data.phases[0].id) || genId('phase'));
+        delete pd.title;
+      }
+    });
+  }
+
+  try{
+    const res2 = await storage.get(SNAPSHOTS_KEY, false);
+    snapshots = res2 ? JSON.parse(res2.value) : [];
+  }catch(e){
+    snapshots = [];
+  }
+  render();
+}
+
+function setSaveNote(state){
+  const el = document.getElementById('saveNote');
+  el.className = 'save-note ' + state;
+  el.textContent = state === 'saving' ? 'Saving…' : state === 'saved' ? 'All changes saved' : state === 'failed' ? 'Save failed — retrying…' : '';
+}
+
+async function saveNow(){
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  setSaveNote('saving');
+  try{
+    await storage.set(STORAGE_KEY, JSON.stringify(data), false);
+    setSaveNote('saved');
+  }catch(e){
+    setSaveNote('failed');
+  }
+}
+
+function scheduleSave(){
+  setSaveNote('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 500);
+}
+
+async function saveSnapshots(){
+  try{
+    await storage.set(SNAPSHOTS_KEY, JSON.stringify(snapshots), false);
+  }catch(e){
+    toast('Could not save version');
+  }
+}
+
+function logChange(msg){
+  data.changeLog = data.changeLog || [];
+  data.changeLog.unshift({ ts: new Date().toISOString(), msg });
+  if(data.changeLog.length > 60) data.changeLog.length = 60;
+  renderHistory();
+}
+
+function statusClass(s){ return 'status-' + s.replace(/\s+/g,'-'); }
+
+function autoStatus(progress){
+  const p = Number(progress);
+  if(p >= 100) return 'Complete';
+  if(p <= 0) return 'Not Started';
+  return 'In Progress';
+}
+
+function computeOverall(){
+  if(!data.phases.length) return 0;
+  const sum = data.phases.reduce((a,p)=>a + (Number(p.progress)||0), 0);
+  return Math.round(sum / data.phases.length);
+}
+
+function isOverdue(targetDate, status){
+  if(status === 'Complete') return false;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) return false;
+  return targetDate < todayISO();
+}
+
+function updateOverallUI(){
+  const pct = computeOverall();
+  document.getElementById('overallPct').textContent = pct + '% Complete';
+  document.getElementById('overallFill').style.width = pct + '%';
+}
+
+function render(){
+  document.getElementById('metaTitle').value = data.meta.title;
+  document.getElementById('metaSubtitle').value = data.meta.subtitle;
+  document.getElementById('metaDate').value = data.meta.reportDate;
+  document.getElementById('metaPreparedBy').value = data.meta.preparedBy;
+  document.getElementById('notesField').value = data.notes;
+  updateOverallUI();
+
+  renderLogo();
+  renderPhases();
+  renderPhaseDetails();
+  renderNextSteps();
+  renderSnapshots();
+  renderHistory();
+}
+
+function renderLogo(){
+  const preview = document.getElementById('logoPreview');
+  const removeBtn = document.getElementById('removeLogoBtn');
+  if(data.meta.logo){
+    preview.innerHTML = '<img src="'+data.meta.logo+'" alt="Logo">';
+    removeBtn.style.display = 'inline-block';
+  }else{
+    preview.textContent = 'No logo';
+    removeBtn.style.display = 'none';
+  }
+}
+
+function renderPhases(){
+  const body = document.getElementById('phasesBody');
+  body.innerHTML = '';
+  data.phases.forEach((p, i)=>{
+    const overdue = isOverdue(p.targetDate, p.status);
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="col-move"><div class="move-group">' +
+        '<button class="btn-icon up" data-moveup="'+i+'" title="Move up">&#8593;</button>' +
+        '<button class="btn-icon down" data-movedown="'+i+'" title="Move down">&#8595;</button>' +
+      '</div></td>' +
+      '<td><input type="text" value="'+escAttr(p.name)+'" data-i="'+i+'" data-f="name"></td>' +
+      '<td><select data-i="'+i+'" data-f="status" class="status-select '+statusClass(p.status)+'">'+statusOptions(p.status)+'</select></td>' +
+      '<td><input type="number" min="0" max="100" value="'+p.progress+'" data-i="'+i+'" data-f="progress"></td>' +
+      '<td><input type="date" value="'+p.targetDate+'" data-i="'+i+'" data-f="targetDate">'+(overdue?'<div class="overdue-badge">OVERDUE</div>':'')+'</td>' +
+      '<td><input type="text" value="'+escAttr(p.remarks)+'" data-i="'+i+'" data-f="remarks"></td>' +
+      '<td class="col-remove"><button class="btn-icon" data-remove="'+i+'" title="Remove phase">&#10005;</button></td>';
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('input, select').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      const i = el.dataset.i, f = el.dataset.f;
+      data.phases[i][f] = f==='progress' ? Number(el.value) : el.value;
+      if(f==='progress'){
+        data.phases[i].status = autoStatus(el.value);
+      }
+      updateOverallUI();
+      scheduleSave();
+    });
+    el.addEventListener('change', ()=>{
+      const i = el.dataset.i, f = el.dataset.f;
+      const name = data.phases[i].name;
+      if(f==='progress'){
+        logChange('Phase "'+name+'" progress set to '+data.phases[i].progress+'% (status: '+data.phases[i].status+')');
+        render();
+      }else if(f==='status'){
+        logChange('Phase "'+name+'" status manually set to '+el.value);
+        render();
+      }else if(f==='targetDate'){
+        logChange('Phase "'+name+'" target date changed to '+fmtDate(el.value));
+        render();
+      }
+      scheduleSave();
+    });
+  });
+  body.querySelectorAll('[data-remove]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.remove);
+      const phase = data.phases[i];
+      const attached = data.phaseDetails.filter(function(pd){ return pd.phaseId === phase.id; });
+      if(attached.length){
+        const noun = attached.length === 1 ? 'section' : 'sections';
+        if(!confirm('Phase "'+phase.name+'" has '+attached.length+' attached site detail '+noun+'. Removing this phase will also remove '+(attached.length===1?'that section':'those sections')+'. Continue?')){
+          return;
+        }
+      }
+      data.phases.splice(i, 1);
+      logChange('Removed phase "'+phase.name+'"');
+      if(attached.length){
+        data.phaseDetails = data.phaseDetails.filter(function(pd){ return pd.phaseId !== phase.id; });
+        logChange('Removed '+attached.length+' site detail '+(attached.length===1?'section':'sections')+' attached to "'+phase.name+'"');
+      }
+      render(); scheduleSave();
+    });
+  });
+  body.querySelectorAll('[data-moveup]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.moveup);
+      if(i>0){ [data.phases[i-1], data.phases[i]] = [data.phases[i], data.phases[i-1]]; render(); scheduleSave(); }
+    });
+  });
+  body.querySelectorAll('[data-movedown]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.movedown);
+      if(i < data.phases.length-1){ [data.phases[i+1], data.phases[i]] = [data.phases[i], data.phases[i+1]]; render(); scheduleSave(); }
+    });
+  });
+}
+
+function statusOptions(current){
+  return ['Complete','In Progress','Not Started'].map(function(s){
+    return '<option value="'+s+'" '+(s===current?'selected':'')+'>'+s+'</option>';
+  }).join('');
+}
+
+function phaseSelectOptions(selectedId){
+  if(!data.phases.length){
+    return '<option value="" selected disabled>No phases yet — add one above</option>';
+  }
+  const matchFound = data.phases.some(function(p){ return p.id === selectedId; });
+  let html = matchFound ? '' : '<option value="" selected disabled>Select a phase…</option>';
+  html += data.phases.map(function(p){
+    return '<option value="'+p.id+'" '+(p.id===selectedId?'selected':'')+'>'+escAttr(p.name)+'</option>';
+  }).join('');
+  return html;
+}
+
+function renderPhaseDetails(){
+  const container = document.getElementById('phaseDetailsContainer');
+  container.innerHTML = '';
+
+  data.phaseDetails.forEach((pd, pi)=>{
+    const card = document.createElement('div');
+    card.className = 'card phase-detail-block';
+    card.innerHTML =
+      '<h2><div class="phase-detail-head">' +
+        '<select class="phase-select" data-pdselect="'+pi+'">'+phaseSelectOptions(pd.phaseId)+'</select>' +
+        '<span class="phase-suffix">— Site Detail</span>' +
+      '</div>' +
+      '<div class="move-group">' +
+        '<button class="btn-icon up" data-pdmoveup="'+pi+'" title="Move up">&#8593;</button>' +
+        '<button class="btn-icon down" data-pdmovedown="'+pi+'" title="Move down">&#8595;</button>' +
+        '<button class="btn-icon" data-pdremove="'+pi+'" title="Remove section">&#10005;</button>' +
+      '</div></h2>' +
+      '<div class="sites-container" data-sites-container="'+pi+'"></div>' +
+      '<div class="add-row"><button class="btn-ghost" data-addsite="'+pi+'">+ Add site</button></div>';
+    container.appendChild(card);
+
+    const sitesContainer = card.querySelector('[data-sites-container="'+pi+'"]');
+    pd.sites.forEach((site, si)=>{
+      const overdue = isOverdue(site.targetDate, site.status);
+      const block = document.createElement('div');
+      block.className = 'site-block';
+      block.innerHTML =
+        '<div class="site-block-head">' +
+          '<div class="move-group">' +
+            '<button class="btn-icon up" data-sitemoveup="'+pi+':'+si+'" title="Move up">&#8593;</button>' +
+            '<button class="btn-icon down" data-sitemovedown="'+pi+':'+si+'" title="Move down">&#8595;</button>' +
+          '</div>' +
+          '<div class="field"><label>Site Name</label><input type="text" value="'+escAttr(site.name)+'" data-pi="'+pi+'" data-si="'+si+'" data-f="name"></div>' +
+          '<div class="field" style="flex:1"><label>Status</label><select data-pi="'+pi+'" data-si="'+si+'" data-f="status" class="status-select '+statusClass(site.status)+'">'+statusOptions(site.status)+'</select></div>' +
+          '<div class="field" style="flex:1"><label>Progress %</label><input type="number" min="0" max="100" value="'+site.progress+'" data-pi="'+pi+'" data-si="'+si+'" data-f="progress"></div>' +
+          '<div class="field" style="flex:1"><label>Target Completion</label><input type="text" value="'+escAttr(site.targetDate)+'" data-pi="'+pi+'" data-si="'+si+'" data-f="targetDate" placeholder="date or Completed">'+(overdue?'<div class="overdue-badge">OVERDUE</div>':'')+'</div>' +
+          '<button class="btn-icon" data-removesite="'+pi+':'+si+'" title="Remove site">&#10005;</button>' +
+        '</div>' +
+        '<div class="site-items" data-items-for="'+pi+':'+si+'"></div>' +
+        '<div class="add-row"><button class="btn-ghost" data-additem="'+pi+':'+si+'">+ Add component</button></div>';
+      sitesContainer.appendChild(block);
+
+      const itemsWrap = block.querySelector('[data-items-for="'+pi+':'+si+'"]');
+      site.items.forEach((item, ii)=>{
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML =
+          '<input type="text" value="'+escAttr(item)+'" data-pi="'+pi+'" data-si="'+si+'" data-ii="'+ii+'">' +
+          '<button class="btn-icon" data-removeitem="'+pi+':'+si+':'+ii+'" title="Remove">&#10005;</button>';
+        itemsWrap.appendChild(row);
+      });
+    });
+  });
+
+  container.querySelectorAll('[data-pdselect]').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const pi = Number(el.dataset.pdselect);
+      data.phaseDetails[pi].phaseId = el.value;
+      const phase = data.phases.find(function(p){ return p.id === el.value; });
+      logChange('Linked phase detail section to "'+(phase ? phase.name : el.value)+'"');
+      render(); scheduleSave();
+    });
+  });
+  container.querySelectorAll('[data-pdremove]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const pi = Number(btn.dataset.pdremove);
+      const phase = data.phases.find(function(p){ return p.id === data.phaseDetails[pi].phaseId; });
+      const label = phase ? phase.name : 'this section';
+      if(confirm('Remove phase detail section for "'+label+'"? This cannot be undone.')){
+        data.phaseDetails.splice(pi, 1);
+        logChange('Removed phase detail section for "'+label+'"');
+        render(); scheduleSave();
+      }
+    });
+  });
+  container.querySelectorAll('[data-pdmoveup]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.pdmoveup);
+      if(i>0){ [data.phaseDetails[i-1], data.phaseDetails[i]] = [data.phaseDetails[i], data.phaseDetails[i-1]]; render(); scheduleSave(); }
+    });
+  });
+  container.querySelectorAll('[data-pdmovedown]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.pdmovedown);
+      if(i < data.phaseDetails.length-1){ [data.phaseDetails[i+1], data.phaseDetails[i]] = [data.phaseDetails[i], data.phaseDetails[i+1]]; render(); scheduleSave(); }
+    });
+  });
+  container.querySelectorAll('[data-addsite]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      data.phaseDetails[Number(btn.dataset.addsite)].sites.push({ name:'New Site', status:'Not Started', progress:0, targetDate:'', items:['New component'] });
+      render(); scheduleSave();
+    });
+  });
+
+  container.querySelectorAll('input, select').forEach(el=>{
+    if(el.dataset.pdselect !== undefined) return;
+    el.addEventListener('input', ()=>{
+      const pi = el.dataset.pi, si = el.dataset.si, f = el.dataset.f, ii = el.dataset.ii;
+      if(f){
+        data.phaseDetails[pi].sites[si][f] = f==='progress' ? Number(el.value) : el.value;
+        if(f==='progress'){ data.phaseDetails[pi].sites[si].status = autoStatus(el.value); }
+      } else if(ii !== undefined){
+        data.phaseDetails[pi].sites[si].items[ii] = el.value;
+      }
+      scheduleSave();
+    });
+    el.addEventListener('change', ()=>{
+      const pi = el.dataset.pi, si = el.dataset.si, f = el.dataset.f;
+      if(f){
+        const name = data.phaseDetails[pi].sites[si].name;
+        if(f==='progress'){
+          logChange('Site "'+name+'" progress set to '+data.phaseDetails[pi].sites[si].progress+'% (status: '+data.phaseDetails[pi].sites[si].status+')');
+          render();
+        }else if(f==='status'){
+          logChange('Site "'+name+'" status manually set to '+el.value);
+          render();
+        }
+        scheduleSave();
+      }
+    });
+  });
+  container.querySelectorAll('[data-removesite]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [pi, si] = btn.dataset.removesite.split(':').map(Number);
+      const name = data.phaseDetails[pi].sites[si].name;
+      data.phaseDetails[pi].sites.splice(si, 1);
+      logChange('Removed site "'+name+'"');
+      render(); scheduleSave();
+    });
+  });
+  container.querySelectorAll('[data-sitemoveup]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [pi, si] = btn.dataset.sitemoveup.split(':').map(Number);
+      if(si>0){ const arr = data.phaseDetails[pi].sites; [arr[si-1], arr[si]] = [arr[si], arr[si-1]]; render(); scheduleSave(); }
+    });
+  });
+  container.querySelectorAll('[data-sitemovedown]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [pi, si] = btn.dataset.sitemovedown.split(':').map(Number);
+      const arr = data.phaseDetails[pi].sites;
+      if(si < arr.length-1){ [arr[si+1], arr[si]] = [arr[si], arr[si+1]]; render(); scheduleSave(); }
+    });
+  });
+  container.querySelectorAll('[data-additem]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [pi, si] = btn.dataset.additem.split(':').map(Number);
+      data.phaseDetails[pi].sites[si].items.push('New component');
+      render(); scheduleSave();
+    });
+  });
+  container.querySelectorAll('[data-removeitem]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [pi, si, ii] = btn.dataset.removeitem.split(':').map(Number);
+      data.phaseDetails[pi].sites[si].items.splice(ii, 1);
+      render(); scheduleSave();
+    });
+  });
+}
+
+function renderNextSteps(){
+  const container = document.getElementById('nextStepsContainer');
+  container.innerHTML = '';
+  data.nextSteps.forEach((step, i)=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML =
+      '<input type="text" value="'+escAttr(step)+'" data-i="'+i+'">' +
+      '<button class="btn-icon" data-removestep="'+i+'" title="Remove">&#10005;</button>';
+    container.appendChild(row);
+  });
+  container.querySelectorAll('input').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      data.nextSteps[el.dataset.i] = el.value;
+      scheduleSave();
+    });
+  });
+  container.querySelectorAll('[data-removestep]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      data.nextSteps.splice(Number(btn.dataset.removestep), 1);
+      render(); scheduleSave();
+    });
+  });
+}
+
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  const log = data.changeLog || [];
+  if(!log.length){
+    list.innerHTML = '<div class="log-empty">No changes logged yet. Status and progress updates will appear here.</div>';
+    return;
+  }
+  list.innerHTML = log.map(function(entry){
+    const d = new Date(entry.ts);
+    const stamp = d.toLocaleString();
+    return '<div class="log-entry"><span class="ts">'+stamp+'</span>'+escHtml(entry.msg)+'</div>';
+  }).join('');
+}
+
+function renderSnapshots(){
+  const container = document.getElementById('snapshotsContainer');
+  if(!snapshots.length){
+    container.innerHTML = '<div class="empty-note">No saved versions yet. Save one to track progress over time.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  snapshots.slice().reverse().forEach(function(snap){
+    const row = document.createElement('div');
+    row.className = 'snapshot-row';
+    const d = new Date(snap.ts);
+    row.innerHTML =
+      '<div class="snapshot-meta"><b>'+escHtml(snap.label)+'</b><span class="ts">'+d.toLocaleString()+'</span></div>' +
+      '<div class="snapshot-actions">' +
+        '<button class="btn-ghost" data-loadsnap="'+snap.id+'">Load</button>' +
+        '<button class="btn-ghost" data-downloadsnap="'+snap.id+'">Download Word</button>' +
+        '<button class="btn-ghost" data-downloadsnappdf="'+snap.id+'">Download PDF</button>' +
+        '<button class="btn-icon" data-deletesnap="'+snap.id+'" title="Delete">&#10005;</button>' +
+      '</div>';
+    container.appendChild(row);
+  });
+
+  container.querySelectorAll('[data-loadsnap]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const snap = snapshots.find(function(s){ return s.id === btn.dataset.loadsnap; });
+      if(!snap) return;
+      if(confirm('Load version "'+snap.label+'"? This will replace your current unsaved data.')){
+        data = JSON.parse(JSON.stringify(snap.data));
+        if(!data.changeLog) data.changeLog = [];
+        logChange('Loaded version "'+snap.label+'"');
+        render(); scheduleSave();
+        toast('Version loaded');
+      }
+    });
+  });
+  container.querySelectorAll('[data-downloadsnap]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const snap = snapshots.find(function(s){ return s.id === btn.dataset.downloadsnap; });
+      if(!snap) return;
+      downloadWordDoc(snap.data, snap.label);
+    });
+  });
+  container.querySelectorAll('[data-downloadsnappdf]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const snap = snapshots.find(function(s){ return s.id === btn.dataset.downloadsnappdf; });
+      if(!snap) return;
+      downloadSnapshotPdf(snap.data, snap.label);
+    });
+  });
+  container.querySelectorAll('[data-deletesnap]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const snap = snapshots.find(function(s){ return s.id === btn.dataset.deletesnap; });
+      if(!snap) return;
+      if(confirm('Delete version "'+snap.label+'"? This cannot be undone.')){
+        snapshots = snapshots.filter(function(s){ return s.id !== snap.id; });
+        saveSnapshots(); renderSnapshots();
+        toast('Version deleted');
+      }
+    });
+  });
+}
+
+function escAttr(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+function escHtml(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtDate(d){
+  if(!d) return '';
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const dt = new Date(d + 'T00:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return String(dt.getDate()).padStart(2,'0') + '-' + months[dt.getMonth()] + '-' + dt.getFullYear();
+}
+
+function statusColor(s){
+  if(s==='Complete') return '#2E7D32';
+  if(s==='In Progress') return '#B8860B';
+  return '#666666';
+}
+
+function overallOf(d){
+  if(!d.phases.length) return 0;
+  const sum = d.phases.reduce(function(a,p){ return a + (Number(p.progress)||0); }, 0);
+  return Math.round(sum / d.phases.length);
+}
+
+function buildWordHtml(sourceData, variant){
+  variant = variant || 'print';
+  const d = sourceData || data;
+  const hasLogo = !!d.meta.logo;
+  const overall = overallOf(d);
+  const phaseRows = d.phases.map(function(p, i){
+    const overdue = isOverdue(p.targetDate, p.status);
+    return '<tr>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;text-align:center;">'+(i+1)+'</td>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;"><b>'+escHtml(p.name)+'</b></td>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;text-align:center;"><b style="color:'+statusColor(p.status)+'">'+escHtml(p.status)+'</b></td>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;text-align:center;"><b>'+p.progress+'%</b></td>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;text-align:center;">'+fmtDate(p.targetDate)+(overdue?' <span style="color:#C0392B;font-weight:bold;">(Overdue)</span>':'')+'</td>' +
+      '<td style="border:1px solid #BFBFBF;padding:8px;">'+escHtml(p.remarks)+'</td>' +
+    '</tr>';
+  }).join('');
+
+  function buildSiteRows(sites){
+    return sites.map(function(site){
+      return site.items.map(function(item, idx){
+        if(idx===0){
+          const overdue = isOverdue(site.targetDate, site.status);
+          return '<tr>' +
+            '<td rowspan="'+site.items.length+'" style="border:1px solid #BFBFBF;padding:8px;background:#D9E2F3;"><b style="color:#1F3864">'+escHtml(site.name)+'</b></td>' +
+            '<td style="border:1px solid #BFBFBF;padding:8px;">'+escHtml(item)+'</td>' +
+            '<td rowspan="'+site.items.length+'" style="border:1px solid #BFBFBF;padding:8px;text-align:center;"><b style="color:'+statusColor(site.status)+'">'+escHtml(site.status)+'</b></td>' +
+            '<td rowspan="'+site.items.length+'" style="border:1px solid #BFBFBF;padding:8px;text-align:center;"><b>'+site.progress+'%</b></td>' +
+            '<td rowspan="'+site.items.length+'" style="border:1px solid #BFBFBF;padding:8px;text-align:center;">'+fmtDate(site.targetDate)+(overdue?' <span style="color:#C0392B;font-weight:bold;">(Overdue)</span>':'')+'</td>' +
+          '</tr>';
+        }
+        return '<tr><td style="border:1px solid #BFBFBF;padding:8px;">'+escHtml(item)+'</td></tr>';
+      }).join('');
+    }).join('');
+  }
+
+  function buildSiteSections(sites){
+    return sites.map(function(site){
+      const items = site.items.map(function(i){
+        return '<li style="margin-bottom:4px;">'+escHtml(i)+(site.status==='In Progress' ? ' — in progress' : '')+'</li>';
+      }).join('');
+      return '<h3 style="color:#1F3864;font-size:14pt;margin-top:20px;">'+escHtml(site.name)+' — '+escHtml(site.status)+'</h3><ul>'+items+'</ul>';
+    }).join('');
+  }
+
+  let sectionNum = 3;
+  const phaseDetailsHtml = d.phaseDetails.map(function(pd){
+    const phase = d.phases.find(function(p){ return p.id === pd.phaseId; });
+    const label = (phase ? phase.name : 'Unassigned Phase') + ' — Site Detail';
+    const html = '<h2 class="section">'+sectionNum+'. '+escHtml(label)+'</h2>' +
+      '<table><tr><th>Site Location</th><th>Installed Component</th><th>Status</th><th>Progress</th><th>Target Completion</th></tr>'+buildSiteRows(pd.sites)+'</table>' +
+      buildSiteSections(pd.sites);
+    sectionNum++;
+    return html;
+  }).join('');
+  const nextStepsNum = sectionNum++;
+  const notesNum = sectionNum++;
+
+  const nextStepsHtml = d.nextSteps.map(function(s){ return '<li style="margin-bottom:6px;">'+escHtml(s)+'</li>'; }).join('');
+
+  const logoHtml = (d.meta.logo && variant !== 'word') ? '<img src="'+d.meta.logo+'" style="max-height:70px;display:block;margin:0 auto 12px;">' : '';
+
+  const printWatermarkCss = (variant==='print' && hasLogo) ?
+    '.watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:55%;max-width:420px;opacity:.10;z-index:-1;pointer-events:none;}' : '';
+
+  const printWatermarkImg = (variant==='print' && hasLogo) ?
+    '<img class="watermark" src="'+d.meta.logo+'" alt="">' : '';
+
+  const bodyContent =
+    logoHtml +
+    '<h1>'+escHtml(d.meta.title)+'</h1>' +
+    '<h2 class="sub">'+escHtml(d.meta.subtitle)+'</h2>' +
+    '<p class="tag">Project Status Report — Stakeholder Update</p>' +
+    '<hr style="border:1px solid #1F3864;margin:16px 0;">' +
+    '<p><b>Report Date:</b> '+fmtDate(d.meta.reportDate)+'</p>' +
+    '<p><b>Prepared By:</b> '+escHtml(d.meta.preparedBy || '[Project Manager Name]')+'</p>' +
+    '<p><b>Overall Project Progress:</b> <b style="color:#B8860B">'+overall+'% Complete</b></p>' +
+    '<h2 class="section">1. Project Overview</h2>' +
+    '<p>This report summarizes the current status of the '+escHtml(d.meta.title)+' project, covering progress across all project phases.</p>' +
+    '<h2 class="section">2. Project Phase Status Summary</h2>' +
+    '<table><tr><th>#</th><th>Project Phase</th><th>Status</th><th>Progress</th><th>Target Date</th><th>Remarks</th></tr>'+phaseRows+'</table>' +
+    phaseDetailsHtml +
+    '<h2 class="section">'+nextStepsNum+'. Next Steps</h2><ul>'+nextStepsHtml+'</ul>' +
+    '<h2 class="section">'+notesNum+'. Notes</h2><p style="font-style:italic;">'+escHtml(d.notes)+'</p>';
+
+  const wrappedBody = printWatermarkImg + bodyContent;
+
+  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+  '<head><meta charset="utf-8"><title>'+escHtml(d.meta.title)+'</title>' +
+  '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' +
+  '<style>' +
+  'body{ font-family:Calibri, Arial, sans-serif; color:#20242C; font-size:11pt; }' +
+  'table{ border-collapse:collapse; width:100%; margin-bottom:14px; }' +
+  'th{ background:#1F3864; color:#fff; padding:8px; text-align:left; font-size:10.5pt; }' +
+  'h1{ color:#1F3864; text-align:center; font-size:20pt; margin-bottom:2px; }' +
+  'h2.sub{ color:#1F3864; text-align:center; font-size:13pt; font-weight:normal; margin:2px 0; }' +
+  'p.tag{ text-align:center; color:#555; font-style:italic; font-size:11pt; margin-top:2px; }' +
+  'h2.section{ color:#1F3864; font-size:15pt; border-bottom:2px solid #1F3864; padding-bottom:4px; margin-top:26px; }' +
+  '@media print{ h2.section{ page-break-after:avoid; } table{ page-break-inside:auto; } tr{ page-break-inside:avoid; } }' +
+  printWatermarkCss +
+  '</style></head><body>' +
+  wrappedBody +
+  '</body></html>';
+}
+
+function downloadWordDoc(sourceData, labelOverride){
+  const d = sourceData || data;
+  const html = buildWordHtml(d, 'word');
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const base = labelOverride ? (d.meta.title + '_' + labelOverride) : d.meta.title;
+  const safeTitle = (base || 'Project_Status_Report').replace(/[^a-z0-9]+/gi,'_').slice(0,80);
+  a.href = url;
+  a.download = safeTitle + '_Status_Report.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Word document downloaded');
+  if(!sourceData){ logChange('Downloaded Word document (current data)'); }
+}
+
+function loadScriptOnce(src){
+  return new Promise(function(resolve, reject){
+    const already = document.querySelector('script[data-dyn-src="'+src+'"]');
+    if(already){
+      if(already.dataset.loaded === '1'){ resolve(); } else { already.addEventListener('load', function(){ resolve(); }); already.addEventListener('error', reject); }
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.dataset.dynSrc = src;
+    s.onload = function(){ s.dataset.loaded = '1'; resolve(); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function ensurePdfLibs(){
+  if(window.jspdf && window.html2canvas) return;
+  await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if(!window.jspdf || !window.html2canvas) throw new Error('PDF libraries failed to load');
+}
+
+function imageFormatFromDataUrl(dataUrl){
+  if(/^data:image\/png/i.test(dataUrl)) return 'PNG';
+  if(/^data:image\/webp/i.test(dataUrl)) return 'WEBP';
+  return 'JPEG';
+}
+
+function getImageDimensions(dataUrl){
+  return new Promise(function(resolve){
+    const img = new Image();
+    img.onload = function(){ resolve({ width: img.naturalWidth || 1, height: img.naturalHeight || 1 }); };
+    img.onerror = function(){ resolve({ width:1, height:1 }); };
+    img.src = dataUrl;
+  });
+}
+
+function renderHtmlToCanvas(html){
+  return new Promise(function(resolve, reject){
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.left = '-10000px';
+    iframe.style.top = '0';
+    iframe.style.width = '800px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+    setTimeout(function(){
+      window.html2canvas(doc.body, { scale:2, useCORS:true, backgroundColor:'#ffffff', windowWidth:800 })
+        .then(function(canvas){ document.body.removeChild(iframe); resolve(canvas); })
+        .catch(function(err){ document.body.removeChild(iframe); reject(err); });
+    }, 350);
+  });
+}
+
+async function generatePdf(sourceData, labelOverride){
+  const d = sourceData || data;
+  await ensurePdfLibs();
+  const html = buildWordHtml(d, 'canvas');
+  const canvas = await renderHtmlToCanvas(html);
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'pt', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+  pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+  while(heightLeft > 0){
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  if(d.meta.logo){
+    const dims = await getImageDimensions(d.meta.logo);
+    const fmt = imageFormatFromDataUrl(d.meta.logo);
+    const wmWidth = pageWidth * 0.5;
+    const wmHeight = wmWidth * (dims.height / dims.width);
+    const totalPages = pdf.internal.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){
+      pdf.setPage(i);
+      pdf.saveGraphicsState();
+      pdf.setGState(pdf.GState({ opacity:0.12 }));
+      pdf.addImage(d.meta.logo, fmt, (pageWidth-wmWidth)/2, (pageHeight-wmHeight)/2, wmWidth, wmHeight);
+      pdf.restoreGraphicsState();
+    }
+  }
+
+  const base = labelOverride ? (d.meta.title + '_' + labelOverride) : d.meta.title;
+  const safeTitle = (base || 'Project_Status_Report').replace(/[^a-z0-9]+/gi,'_').slice(0,80);
+  return { pdf: pdf, filename: safeTitle + '_Status_Report.pdf' };
+}
+
+function openPrintFallback(sourceData){
+  const html = buildWordHtml(sourceData || data, 'print');
+  const w = window.open('', '_blank');
+  if(!w){ toast('Please allow pop-ups to export PDF'); return false; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function(){
+    try{ w.focus(); w.print(); }catch(e){}
+  }, 400);
+  return true;
+}
+
+async function exportPDF(){
+  toast('Generating PDF\u2026');
+  try{
+    const result = await generatePdf(data, null);
+    result.pdf.save(result.filename);
+    toast('PDF downloaded');
+    logChange('Downloaded PDF (current data)');
+  }catch(e){
+    if(openPrintFallback(data)){
+      toast('Could not auto-generate PDF \u2014 opened print dialog instead');
+      logChange('Exported PDF via print dialog (current data)');
+    }
+  }
+}
+
+async function downloadSnapshotPdf(snapData, label){
+  toast('Generating PDF\u2026');
+  try{
+    const result = await generatePdf(snapData, label);
+    result.pdf.save(result.filename);
+    toast('PDF downloaded');
+  }catch(e){
+    openPrintFallback(snapData);
+  }
+}
+
+function buildPlainTextSummary(){
+  const lines = [];
+  lines.push(data.meta.title);
+  lines.push(data.meta.subtitle);
+  lines.push('Report Date: ' + fmtDate(data.meta.reportDate));
+  lines.push('Prepared By: ' + (data.meta.preparedBy || '-'));
+  lines.push('Overall Progress: ' + computeOverall() + '%');
+  lines.push('');
+  lines.push('PHASE STATUS:');
+  data.phases.forEach(function(p){
+    lines.push('- ' + p.name + ': ' + p.status + ' (' + p.progress + '%) — Target: ' + fmtDate(p.targetDate) + (p.remarks ? ' — ' + p.remarks : ''));
+  });
+  data.phaseDetails.forEach(function(pd){
+    const phase = data.phases.find(function(p){ return p.id === pd.phaseId; });
+    const label = (phase ? phase.name : 'Unassigned Phase') + ' — Site Detail';
+    lines.push('');
+    lines.push(label.toUpperCase() + ':');
+    pd.sites.forEach(function(s){
+      lines.push(s.name + ' — ' + s.status + ' (' + s.progress + '%)');
+      s.items.forEach(function(i){ lines.push('   • ' + i); });
+    });
+  });
+  lines.push('');
+  lines.push('NEXT STEPS:');
+  data.nextSteps.forEach(function(s){ lines.push('- ' + s); });
+  if(data.notes){ lines.push(''); lines.push('NOTES: ' + data.notes); }
+  return lines.join('\n');
+}
+
+function copySummary(){
+  const text = buildPlainTextSummary();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      toast('Summary copied to clipboard');
+    }).catch(function(){
+      toast('Copy failed — please select and copy manually');
+    });
+  }else{
+    toast('Clipboard not available in this browser');
+  }
+}
+
+// ---- Event bindings ----
+document.getElementById('metaTitle').addEventListener('input', function(e){ data.meta.title = e.target.value; scheduleSave(); });
+document.getElementById('metaSubtitle').addEventListener('input', function(e){ data.meta.subtitle = e.target.value; scheduleSave(); });
+document.getElementById('metaDate').addEventListener('input', function(e){ data.meta.reportDate = e.target.value; scheduleSave(); });
+document.getElementById('metaPreparedBy').addEventListener('input', function(e){ data.meta.preparedBy = e.target.value; scheduleSave(); });
+document.getElementById('notesField').addEventListener('input', function(e){ data.notes = e.target.value; scheduleSave(); });
+
+document.getElementById('uploadLogoBtn').addEventListener('click', function(){ document.getElementById('logoInput').click(); });
+document.getElementById('logoInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    data.meta.logo = reader.result;
+    renderLogo();
+    logChange('Uploaded report logo');
+    scheduleSave();
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('removeLogoBtn').addEventListener('click', function(){
+  data.meta.logo = null;
+  renderLogo();
+  logChange('Removed report logo');
+  scheduleSave();
+});
+
+document.getElementById('addPhaseBtn').addEventListener('click', function(){
+  data.phases.push({ id: genId('phase'), name:'New Phase', status:'Not Started', progress:0, targetDate:'', remarks:'' });
+  logChange('Added new phase');
+  render(); scheduleSave();
+});
+document.getElementById('addPhaseDetailBtn').addEventListener('click', function(){
+  if(!data.phases.length){
+    toast('Add a phase in Project Phase Status first');
+    return;
+  }
+  const usedIds = data.phaseDetails.map(function(pd){ return pd.phaseId; });
+  const nextPhase = data.phases.find(function(p){ return usedIds.indexOf(p.id) === -1; }) || data.phases[0];
+  data.phaseDetails.push({
+    phaseId: nextPhase.id,
+    sites: [{ name:'New Site', status:'Not Started', progress:0, targetDate:'', items:['New component'] }]
+  });
+  logChange('Added phase detail section for "'+nextPhase.name+'"');
+  render(); scheduleSave();
+});
+document.getElementById('addStepBtn').addEventListener('click', function(){
+  data.nextSteps.push('New next step');
+  render(); scheduleSave();
+});
+document.getElementById('downloadBtn').addEventListener('click', function(){ downloadWordDoc(null, null); });
+document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+document.getElementById('copySummaryBtn').addEventListener('click', copySummary);
+document.getElementById('saveNowBtn').addEventListener('click', function(){
+  saveNow().then(function(){ toast('Saved'); });
+});
+
+window.addEventListener('beforeunload', function(e){
+  if(saveTimer){ e.preventDefault(); e.returnValue = ''; }
+});
+
+document.getElementById('resetBtn').addEventListener('click', function(){
+  if(confirm('Reset all fields to the original sample data? This cannot be undone.')){
+    data = JSON.parse(JSON.stringify(defaultData));
+    render(); scheduleSave();
+    toast('Reset to sample data');
+  }
+});
+
+document.getElementById('exportJsonBtn').addEventListener('click', function(){
+  const payload = JSON.stringify({ data: data, snapshots: snapshots }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeTitle = (data.meta.title || 'Project_Status_Report').replace(/[^a-z0-9]+/gi,'_').slice(0,80);
+  a.href = url;
+  a.download = safeTitle + '_backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Data exported');
+  logChange('Exported data backup (JSON)');
+  scheduleSave();
+});
+
+document.getElementById('importJsonBtn').addEventListener('click', function(){
+  document.getElementById('importJsonInput').click();
+});
+document.getElementById('importJsonInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    let parsed;
+    try{
+      parsed = JSON.parse(reader.result);
+    }catch(err){
+      toast('Import failed — not a valid JSON file');
+      return;
+    }
+    const incoming = parsed && parsed.data ? parsed.data : parsed;
+    if(!incoming || !incoming.meta || !Array.isArray(incoming.phases)){
+      toast('Import failed — file is not a recognized backup');
+      return;
+    }
+    if(!confirm('Import this backup? This will replace your current unsaved data and versions.')){
+      return;
+    }
+    data = incoming;
+    if(!data.changeLog) data.changeLog = [];
+    if(!data.phaseDetails) data.phaseDetails = [];
+    snapshots = Array.isArray(parsed.snapshots) ? parsed.snapshots : snapshots;
+    logChange('Imported data from backup file');
+    render(); saveNow(); saveSnapshots();
+    toast('Data imported');
+  };
+  reader.onerror = function(){ toast('Import failed — could not read file'); };
+  reader.readAsText(file);
+});
+
+document.getElementById('clearHistoryBtn').addEventListener('click', function(){
+  if(confirm('Clear the change history log?')){
+    data.changeLog = [];
+    renderHistory(); scheduleSave();
+    toast('History cleared');
+  }
+});
+
+// Save version modal
+const promptOverlay = document.getElementById('promptOverlay');
+const promptInput = document.getElementById('promptInput');
+document.getElementById('saveVersionBtn').addEventListener('click', function(){
+  promptInput.value = '';
+  promptOverlay.classList.add('show');
+  setTimeout(function(){ promptInput.focus(); }, 50);
+});
+document.getElementById('promptCancel').addEventListener('click', function(){
+  promptOverlay.classList.remove('show');
+});
+document.getElementById('promptOk').addEventListener('click', function(){
+  const label = promptInput.value.trim() || ('Version ' + (snapshots.length + 1));
+  const snap = { id: 'snap_' + Date.now(), label: label, ts: new Date().toISOString(), data: JSON.parse(JSON.stringify(data)) };
+  snapshots.push(snap);
+  saveSnapshots();
+  logChange('Saved version "' + label + '"');
+  renderSnapshots(); scheduleSave();
+  promptOverlay.classList.remove('show');
+  toast('Version saved');
+});
+promptInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){ document.getElementById('promptOk').click(); }
+  if(e.key === 'Escape'){ promptOverlay.classList.remove('show'); }
+});
+
+loadData();
+</script>
+</body>
+</html>
